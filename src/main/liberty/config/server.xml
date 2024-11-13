@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Server configuration for PostgreSQL connection">
+
+
+    <!-- Enable features -->
+    <featureManager>
+        <feature>jdbc-4.3</feature> <!-- JDBC 4.3 -->
+        <feature>beanValidation-3.0</feature> <!-- Bean Validation 3.0 -->
+        <feature>mpConfig-3.1</feature>
+        <feature>mpHealth-4.0</feature>
+        <feature>jakartaee-10.0</feature> <!-- Jakarta EE 10 -->
+    </featureManager>
+    <httpEndpoint id="defaultHttEndpoint" httpPort="9080" httpsPort="9443" />
+
+
+    <!-- Configuración de conexión a base de datos -->
+    <dataSource id="defaultDataSource" jndiName="jdbc/cine"
+            type="javax.sql.DataSource"  transactional="true"
+    >
+    <jdbcDriver libraryRef="postgresql-library" />
+    <properties.postgresql
+            user="cine"
+            password="cine"
+            databaseName="cine_prn335"
+            serverName="localhost"
+            portNumber="5432" />
+    </dataSource>
+
+    <library id="postgresql-library">
+        <file name="${server.config.dir}/postgresql-42.7.4.jar" />
+    </library>
+
+
+
+    <!-- Configuración de seguridad -->
+    <basicRegistry id="BasicUserRegistry">
+        <user name="admin" password="adminPassword"/>
+        <user name="cineUser" password="cinePassword"/>
+    </basicRegistry>
+
+    <administrator-role>
+        <user>admin</user>
+    </administrator-role>
+
+
+</server>

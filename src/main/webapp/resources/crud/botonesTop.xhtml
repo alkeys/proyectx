@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: wolf
+  Date: 22/10/24
+  Time: 22:21
+-->
+<ui:component
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:cc="jakarta.faces.composite"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="primefaces">
+    <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute
+                name="frm"
+                type="sv.edu.occ.ues.ingenieria.prn335.cine.boundary.jsf.AbstractFrm"
+                required="true"
+                shortDescription="El bean que implementa funcionalidades CRUD."
+        />
+        <cc:attribute
+                name="refrescar"
+                type="java.lang.String"
+                required="false"
+                default=":pnlDetalle :frmTable"
+                shortDescription="Componentes a actualizar después de realizar una acción en el formulario."
+        />
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <h:panelGrid columns="2">
+            <p:commandButton value="#{abstractfrm['abstractfrm.new']}"
+                             style="padding: 1px;"
+                             actionListener="#{cc.attrs.frm.btnNuevoHandler}"
+                             update="#{cc.attrs.refrescar}"/>
+
+            <p:commandButton value="#{abstractfrm['abstractfrm.cancel']}"
+                             style="padding: 1px;  margin-left: 500px;"
+                             update="#{cc.attrs.refrescar}"
+                             actionListener="#{cc.attrs.frm.btnCancelarHandler}"
+                             styleClass="ui-button-danger">
+            </p:commandButton>
+        </h:panelGrid>
+    </cc:implementation>
+</ui:component>

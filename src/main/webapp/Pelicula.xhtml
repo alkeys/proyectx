@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<f:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="jakarta.faces.facelets"
+        xmlns:h="jakarta.faces.html"
+        xmlns:p="http://primefaces.org/ui"
+        template="WEB-INF/templates/principal.xhtml">
+
+    <f:define name="titulo">
+         Pelicula
+    </f:define>
+
+    <f:define name="cuerpo">
+
+        <!--
+        Visual de registros
+        -->
+
+        <h:form id="frmTable">
+            <p:dataTable value="#{frmPelicula.modelo}"
+                         var="r"
+                         rows="10"
+                         lazy="true"
+                         selectionMode="single"
+                         selection="#{frmPelicula.registro}"
+                         paginator="true"
+            >
+                <p:ajax event="rowSelect" update="pnlDetalle" process="@this"/>
+                <p:column headerText="ID">
+                    <h:outputText value="#{r.idPelicula}"/>
+                </p:column>
+                <p:column headerText="Nombre">
+                    <h:outputText value="#{r.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Sinosip">
+                    <h:outputText value="#{r.sinopsis}"/>
+                </p:column>
+
+
+
+            </p:dataTable>
+
+
+            <h:panelGroup>
+                <p:panelGrid columns="2">
+                    <p:commandButton value="Nuevo Pelicula"
+                                     ajax="true"
+                                     process="@this"
+                                     update="pnlDetalle"
+                                     actionListener="#{frmPelicula.btnNuevoHandler}">
+                    </p:commandButton>
+
+                    <p:commandButton value="Cancelar"
+                                     ajax="true"
+                                     process="@this"
+                                     update="pnlDetalle"
+                                     actionListener="#{frmPelicula.btnCancelarHandler}"
+                                     styleClass="ui-button-danger">
+
+
+                    </p:commandButton>
+
+                </p:panelGrid>
+            </h:panelGroup>
+        </h:form>
+
+        <!--
+        Seccion de creacion de nuevo registro
+        -->
+
+        <h:panelGroup id="pnlDetalle" styleClass="detalle">
+            <h:form rendered="#{not empty frmPelicula.registro}">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="ID" for="txtId"/>
+                    <p:inputText id="txtId" value="#{frmPelicula.registro.idPelicula}"
+                                 readonly="true" disabled="true"/>
+
+                    <p:outputLabel value="Nombre" for="txtNombre"/>
+                    <p:inputText id="txtNombre" value="#{frmPelicula.registro.nombre}" size="70" required="true"/>
+
+                    <p:outputLabel value="Sipnosis" for="txtNombre"/>
+                    <p:inputText id="txtsinopsis" value="#{frmPelicula.registro.sinopsis}" size="70" />
+
+
+                </h:panelGrid>
+
+                <!--
+                Seccion de control de guardado de registro o modificacion/eliminacion de registro existente
+                -->
+
+                <p:panelGrid columns="3">
+                    <p:commandButton value="Guardar" ajax="true"
+                                     process="@form"
+                                     update="pnlDetalle :frmTable"
+                                     actionListener="#{frmPelicula.btnGuardarHandler}"
+                                     disabled="#{frmPelicula.registro != null and frmPelicula.registro.idPelicula != null}">
+                    </p:commandButton>
+                    <p:commandButton value="Eliminar" ajax="true"
+                                     process="@form"
+                                     update="pnlDetalle :frmTable"
+                                     actionListener="#{frmPelicula.btnEliminarHandler}"
+                                     disabled="#{frmPelicula.registro == null or frmPelicula.registro.idPelicula == null}"
+                                     styleClass="ui-button-danger">
+
+                    </p:commandButton>
+                    <p:commandButton value="Modificar" ajax="true"
+                                     process="@form"
+                                     update="pnlDetalle :frmTable"
+                                     actionListener="#{frmPelicula.btnModificarHandler}"
+                                     disabled="#{frmPelicula.registro == null or frmPelicula.registro.idPelicula == null}"
+                                     styleClass="ui-button-warning">
+                    </p:commandButton>
+                </p:panelGrid>
+                <p:messages/>
+            </h:form>
+        </h:panelGroup>
+    </f:define>
+</f:composition>
