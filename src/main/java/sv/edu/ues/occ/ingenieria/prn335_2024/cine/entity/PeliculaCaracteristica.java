@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "pelicula_caracteristica", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "PeliculaCaracteristica.findByIdPelicula",query = "SELECT pc FROM PeliculaCaracteristica PC WHERE pc.idPelicula.idPelicula=:idPelicula ORDER BY pc.idTipoPelicula.nombre ASC "),
+        @NamedQuery(name = "PeliculaCaracteristica.countByIdPelicula", query = "SELECT COUNT(pc.idPeliculaCaracteristica) FROM PeliculaCaracteristica pc WHERE pc.idPelicula.idPelicula=:idPelicula")
+})
 public class PeliculaCaracteristica {
     @Id
     @Column(name = "id_pelicula_caracteristica", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPliculaCaracteristica;
+    private Long idPeliculaCaracteristica;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tipo_pelicula")
@@ -22,21 +26,12 @@ public class PeliculaCaracteristica {
     @Column(name = "valor")
     private String valor;
 
-    public PeliculaCaracteristica(Long idPliculaCaracteristica) {
-        this.idPliculaCaracteristica = idPliculaCaracteristica;
+    public Long getIdPeliculaCaracteristica() {
+        return idPeliculaCaracteristica;
     }
 
-    public PeliculaCaracteristica()
-    {
-
-    }
-
-    public Long getIdPliculaCaracteristica() {
-        return idPliculaCaracteristica;
-    }
-
-    public void setIdPliculaCaracteristica(Long id) {
-        this.idPliculaCaracteristica = id;
+    public void setIdPeliculaCaracteristica(Long id) {
+        this.idPeliculaCaracteristica = id;
     }
 
     public TipoPelicula getIdTipoPelicula() {
@@ -63,7 +58,4 @@ public class PeliculaCaracteristica {
         this.valor = valor;
     }
 
-    public Object getId() {
-        return idPliculaCaracteristica;
-    }
 }

@@ -117,7 +117,7 @@ public class frmTipoPago extends AbstractFrm<TipoPago> implements Serializable {
     public void btnNuevoHandler(ActionEvent ae) {
         this.registro = new TipoPago();
         this.registro.setActivo(true);
-        this.estado = Estado_crud.CREAR;
+        this.estado = ESTADO_CRUD.CREAR;
     }
 
     public void btnCancelarHandler(ActionEvent ae) {
