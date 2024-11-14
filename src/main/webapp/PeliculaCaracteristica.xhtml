@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<f:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="jakarta.faces.facelets"
+        xmlns:h="jakarta.faces.html"
+        xmlns:p="http://primefaces.org/ui"
+        template="WEB-INF/templates/principal.xhtml">
+
+    <f:define name="titulo">
+        Pelicula Caracteristicas
+    </f:define>
+
+    <f:define name="cuerpo">
+        <!-- Tabla de registros -->
+        <h:form id="frmTable">
+            <p:dataTable value="#{frmPeliculaCaracteristica.modelo}"
+                         var="caracteristica"
+                         rows="10"
+                         lazy="true"
+                         selectionMode="single"
+                         selection="#{frmPeliculaCaracteristica.registro}"
+                         paginator="true">
+                <p:ajax event="rowSelect" update="pnlDetalle" process="@this"/>
+
+                <p:column headerText="ID">
+                    <h:outputText value="#{caracteristica.id}"/>
+                </p:column>
+                <p:column headerText="Tipo">
+                    <h:outputText value="#{caracteristica.tipo}"/>
+                </p:column>
+                <p:column headerText="Valor">
+                    <h:outputText value="#{caracteristica.valor}"/>
+                </p:column>
+            </p:dataTable>
+
+            <h:panelGroup>
+                <p:commandButton value="Nuevo" actionListener="#{frmPeliculaCaracteristica.btnNuevoHandler}" update="pnlDetalle"/>
+            </h:panelGroup>
+        </h:form>
+
+        <!-- Panel de detalle para crear o modificar -->
+        <h:panelGroup id="pnlDetalle" rendered="#{not empty frmPeliculaCaracteristica.registro}">
+            <h:form>
+                <p:panelGrid columns="2">
+                    <p:outputLabel value="ID" for="txtId"/>
+                    <p:inputText id="txtId" value="#{frmPeliculaCaracteristica.registro.id}" readonly="true" disabled="true"/>
+
+                    <p:outputLabel value="Tipo" for="txtTipo"/>
+                    <p:selectOneMenu id="txtTipo" value="#{frmPeliculaCaracteristica.registro.tipo}" required="true">
+                        <f:selectItem itemLabel="Selecciona un tipo" itemValue="" />
+                        <f:selectItem itemLabel="Numerico" itemValue="Numerico"/>
+                        <f:selectItem itemLabel="Alfanumerico" itemValue="Alfanumerico"/>
+                        <p:ajax event="change" listener="#{frmPeliculaCaracteristica.onSelectTipo}" update="mensajeValidacion valorField"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Valor" for="valorField"/>
+                    <p:inputText id="valorField" value="#{frmPeliculaCaracteristica.registro.valor}" required="true"/>
+
+                    <h:outputText id="mensajeValidacion" value="#{frmPeliculaCaracteristica.mensajeValidacion}" style="color:red;"/>
+                </p:panelGrid>
+
+                <!-- Botones de control -->
+                <p:commandButton value="Guardar" actionListener="#{frmPeliculaCaracteristica.btnGuardarHandler}" update="pnlDetalle :frmTable" />
+                <p:commandButton value="Eliminar" actionListener="#{frmPeliculaCaracteristica.btnEliminarHandler}" update="pnlDetalle :frmTable" styleClass="ui-button-danger"/>
+                <p:commandButton value="Modificar" actionListener="#{frmPeliculaCaracteristica.btnModificarHandler}" update="pnlDetalle :frmTable" styleClass="ui-button-warning"/>
+                <p:messages/>
+            </h:form>
+        </h:panelGroup>
+    </f:define>
+</f:composition>

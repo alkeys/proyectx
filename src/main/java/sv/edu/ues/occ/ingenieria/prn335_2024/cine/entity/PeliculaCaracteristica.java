@@ -63,4 +63,7 @@ public class PeliculaCaracteristica {
         this.valor = valor;
     }
 
+    public Object getId() {
+        return idPliculaCaracteristica;
+    }
 }

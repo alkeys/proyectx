@@ -83,4 +83,8 @@ public class TipoPelicula {
     public void setPeliculaCaracteristicaList(List<PeliculaCaracteristica> peliculaCaracteristicaList) {
         PeliculaCaracteristicaList = peliculaCaracteristicaList;
     }
+
+    public TipoPelicula getTipo() {
+        return null;
+    }
 }

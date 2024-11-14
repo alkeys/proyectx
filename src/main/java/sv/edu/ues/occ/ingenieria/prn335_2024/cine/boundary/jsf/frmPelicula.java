@@ -115,5 +115,4 @@ public class frmPelicula implements Serializable {
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Modificado exitosamente", null);
         facesContext.addMessage(null, mensaje);
     }
-
 }
