@@ -43,12 +43,7 @@ public class frmMenu implements Serializable {
                 .ajax(true)
                 .command("#{frmMenu.navegar('TipoReserva.jsf')}")
                 .build();
-        DefaultMenuItem Peliculas_Lista = DefaultMenuItem.builder()
-                .value("Peliculas")
-                .icon("pi pi-list")
-                .ajax(true)
-                .command("#{frmMenu.navegar('Pelicula.jsf')}")
-                .build();
+
         DefaultMenuItem itemPelicula = DefaultMenuItem.builder()
                 .value("Tipos de Película")
                 .icon("pi pi-star")
@@ -67,14 +62,25 @@ public class frmMenu implements Serializable {
                 .ajax(true)
                 .command("#{frmMenu.navegar('TipoPago.jsf')}")
                 .build();
+        DefaultSubMenu Cine = DefaultSubMenu.builder()
+                .label("Cine")
+                .expanded(true)
+                .build();
+        DefaultMenuItem Peliculas_Lista = DefaultMenuItem.builder()
+                .value("Peliculas")
+                .icon("pi pi-list")
+                .ajax(true)
+                .command("#{frmMenu.navegar('Pelicula.jsf')}")
+                .build();
 
         tipos.getElements().add(itemSala);
         tipos.getElements().add(itemAsiento);
         tipos.getElements().add(itemReserva);
         tipos.getElements().add(itemPelicula);
-        tipos.getElements().add(Peliculas_Lista);
         tipos.getElements().add(itemProducto);
         tipos.getElements().add(itemPago);
+        Cine.getElements().add(Peliculas_Lista);
+        model.getElements().add(Cine);
         model.getElements().add(tipos);
 
 

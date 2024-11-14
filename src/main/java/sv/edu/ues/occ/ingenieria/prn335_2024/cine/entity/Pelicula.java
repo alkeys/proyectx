@@ -28,6 +28,8 @@ public class Pelicula {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "idPelicula")
     public List<Programacion> ProgramacionList;
 
+    private String autocompletado;
+
     public Pelicula (long idPelicula)
     {
         this.idPelicula = idPelicula;
@@ -75,5 +77,13 @@ public class Pelicula {
 
     public void setProgramacionList(List<Programacion> programacionList) {
         ProgramacionList = programacionList;
+    }
+
+    public String getAutocompletado() {
+        return autocompletado;
+    }
+
+    public void setAutocompletado(String autocompletado) {
+        this.autocompletado = autocompletado;
     }
 }

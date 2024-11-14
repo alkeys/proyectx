@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public abstract class AbstractfrmImplementacion<T> implements Serializable {
 
     private LazyDataModel<T> modelo;
-    private Estado_crud estado = Estado_crud.NINGUNO;
+    private ESTADO_CRUD estado = ESTADO_CRUD.NINGUNO;
     private T registro = null;
 
     public abstract AbstractDataPersistence<T> getDataAccess();
@@ -90,17 +90,17 @@ public abstract class AbstractfrmImplementacion<T> implements Serializable {
     }
 
     public void btnSeleccionarRegistroHandler() {
-        this.estado = Estado_crud.MODIFICAR;
+        this.estado = ESTADO_CRUD.MODIFICAR;
     }
 
     public void btnNuevoHandler(ActionEvent ae) {
         this.instanciarRegistro();
-        this.estado = Estado_crud.CREAR;
+        this.estado = ESTADO_CRUD.CREAR;
     }
 
     public void btnCancelarHandler(ActionEvent ae) {
         this.registro = null;
-        this.estado = Estado_crud.NINGUNO;
+        this.estado = ESTADO_CRUD.NINGUNO;
     }
 
     public void btnModificarHandler(ActionEvent ae) {
@@ -109,7 +109,7 @@ public abstract class AbstractfrmImplementacion<T> implements Serializable {
             AbstractDataPersistence<T> trBean = getDataAccess();
             T modify = trBean.update(registro);
             if (modify != null) {
-                this.estado = Estado_crud.NINGUNO;
+                this.estado = ESTADO_CRUD.NINGUNO;
                 this.registro = null;
                 mensaje.setSeverity(FacesMessage.SEVERITY_INFO);
                 mensaje.setSummary("Registro Modificado con exito");
@@ -127,7 +127,7 @@ public abstract class AbstractfrmImplementacion<T> implements Serializable {
         try {
             AbstractDataPersistence<T> trBean = getDataAccess();
             trBean.delete(registro);
-            this.estado = Estado_crud.NINGUNO;
+            this.estado = ESTADO_CRUD.NINGUNO;
             this.registro = null;
             mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro eliminado con éxito", "Se eliminó el registro");
             getFacesContext().addMessage(null, mensaje);
@@ -143,7 +143,7 @@ public abstract class AbstractfrmImplementacion<T> implements Serializable {
         try {
             AbstractDataPersistence<T> trBean = getDataAccess();
             trBean.create(registro);
-            this.estado = Estado_crud.NINGUNO;
+            this.estado = ESTADO_CRUD.NINGUNO;
             mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Registro guardado con exito", "Se creo el registro");
             getFacesContext().addMessage(null, mensaje);
         } catch (Exception ex) {
@@ -166,7 +166,7 @@ public abstract class AbstractfrmImplementacion<T> implements Serializable {
         return this.modelo;
     }
 
-    public Estado_crud getEstado() {
+    public ESTADO_CRUD getEstado() {
         return estado;
     }
 }

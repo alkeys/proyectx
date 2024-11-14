@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<f:composition
+        xmlns:h="jakarta.faces.html"
+        xmlns:f="jakarta.faces.facelets"
+        xmlns:c="jakarta.faces.core"
+        xmlns:p="http://primefaces.org/ui"
+        template="WEB-INF/templates/principal.xhtml">
+    <f:define name="titulo">
+        Reserva
+    </f:define>
+
+    <f:define name="cuerpo">
+        <h:form id="frmReserva">
+            <!-- Panel de pestañas -->
+            <p:tabView id="tabs" activeIndex="#{frmReserva.paso}" dynamic="true">
+                <!-- Primera pestaña: Selección de fecha y tipo de reserva -->
+                <p:tab title="Fecha" id="tab1">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel value="Tipo de Reserva" styleClass="txtTipoReserva"/>
+                        <p:selectOneMenu value="#{frmReserva.tipoReservaSelecionado}">
+                            <c:selectItems value="#{frmReserva.listaTipoReserva}" var="tipo"
+                                           itemLabel="#{tipo.nombre}" itemValue="#{tipo}"/>
+                            <p:ajax event="change" listener="#{frmReserva.avanzarPaso}" render="tabs"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2">
+                        <h:outputLabel for="dia" value="Seleccione un Día"/>
+                        <p:calendar id="dia" value="#{frmReserva.diaSleccionado}" pattern="dd/MM/yyyy">
+                            <p:ajax event="change" listener="#{frmReserva.avanzarPaso}" render="tabs"/>
+                        </p:calendar>
+                    </h:panelGrid>
+                </p:tab>
+
+                <!-- Segunda pestaña: Selección de película -->
+                <p:tab title="Función" id="tab2">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel value="Seleccione Película" styleClass="SeleccionePelicula" />
+                        <p:selectOneMenu id="pelicula" value="#{frmReserva.peliculaSeleccionada}">
+                            <c:selectItems value="#{frmReserva.listaProgramaciones}" var="programacion"
+                                           itemLabel="#{programacion.pelicula.nombre}" itemValue="#{programacion}" />
+                            <p:ajax event="change" listener="#{frmReserva.avanzarPaso}" render="tabs"/>
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                </p:tab>
+
+            </p:tabView>
+
+            <!-- Botón para avanzar a la siguiente pestaña -->
+            <p:commandButton value="Next ->" action="#{frmReserva.avanzarPaso}" update="tabs" process="@this"/>
+
+        </h:form>
+    </f:define>
+</f:composition>
