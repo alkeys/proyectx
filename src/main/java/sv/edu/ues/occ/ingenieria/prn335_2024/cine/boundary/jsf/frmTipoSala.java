@@ -7,61 +7,53 @@ import jakarta.faces.event.ActionEvent;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortMeta;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.TipoSalaBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.TipoSala;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Named
 @ViewScoped
 public class frmTipoSala implements Serializable {
 
     @Inject
-    private FacesContext facesContext;
+    FacesContext facesContext;
 
     @Inject
-    private TipoSalaBean tsBean;
-
-    private LazyDataModel<TipoSala> modelo;
-    private List<TipoSala> registros;
-    private TipoSala registro;
+    TipoSalaBean tipoSalaBean;
+    LazyDataModel<TipoSala> modelo;
+    TipoSala registro;
 
     @PostConstruct
-    public void init() {
-        registros = tsBean.findRange(0, 1000000); // Cambié Optional<Object> a List<TipoSala>
-    }
+    public void inicializar() {
+        modelo = new LazyDataModel<TipoSala>() {
+            @Override
+            public String getRowKey(TipoSala object) {
+                return object != null && object.getIdTipoSala() != null ? object.getIdTipoSala().toString() : null;
+            }
 
-    public void btnSeleccionarRegistroHandler(final Integer idTipoSala) {
-        if(idTipoSala == null) {
-            this.registro = registros.stream()
-                    .filter(r -> r.getIdTipoSala().equals(idTipoSala))
-                    .findFirst()
-                    .orElse(null);
-        }
-        this.registro = null;
-    }
+            @Override
+            public TipoSala getRowData(String rowKey) {
+                return rowKey != null && getWrappedData() != null
+                        ? getWrappedData().stream().filter(r -> rowKey.trim().equals(r.getIdTipoSala().toString())).findFirst().orElse(null)
+                        : null;
+            }
 
-    public List<TipoSala> getRegistros() {
-        return registros;
-    }
+            @Override
+            public int count(Map<String, FilterMeta> map) {
+                return tipoSalaBean.count();
+            }
 
-    public void setRegistros(List<TipoSala> registros) {
-        this.registros = registros;
-    }
-
-    public Integer getSeleccionado() {
-        return (registro != null) ? registro.getIdTipoSala() : null;
-    }
-
-    public void seleccionado(Integer seleccionado) {
-        this.registro = registros.stream()
-                .filter(r -> r.getIdTipoSala().equals(seleccionado))
-                .findFirst()
-                .orElse(null);
+            @Override
+            public List<TipoSala> load(int desde, int max, Map<String, SortMeta> map, Map<String, FilterMeta> map1) {
+                return desde >= 0 && max > 0 ? tipoSalaBean.findRange(desde, max) : List.of();
+            }
+        };
     }
 
     public LazyDataModel<TipoSala> getModelo() {
@@ -78,7 +70,6 @@ public class frmTipoSala implements Serializable {
 
     public void btnNuevoHandler(ActionEvent ae) {
         this.registro = new TipoSala();
-        this.registro.setActivo(true);
     }
 
     public void btnCancelarHandler(ActionEvent ae) {
@@ -86,20 +77,17 @@ public class frmTipoSala implements Serializable {
     }
 
     public void btnGuardarHandler(ActionEvent ae) {
-        tsBean.create(registro);
-        FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos guardados exitosamente", null);
-        facesContext.addMessage(null, mensaje);
+        tipoSalaBean.create(registro);
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos guardados exitosamente", null));
     }
 
     public void btnEliminarHandler(ActionEvent ae) {
-        tsBean.delete(registro);
-        FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado exitosamente", null);
-        facesContext.addMessage(null, mensaje);
+        tipoSalaBean.delete(registro);
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado exitosamente", null));
     }
 
     public void btnModificarHandler(ActionEvent ae) {
-        tsBean.update(registro);
-        FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Modificado exitosamente", null);
-        facesContext.addMessage(null, mensaje);
+        tipoSalaBean.update(registro);
+        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Modificado exitosamente", null));
     }
 }
