@@ -68,3 +68,12 @@ h1
 .custom-tabs .ui-tabview-nav li.ui-state-active {
     background-color: #cce5ff;
 }
+
+/* Contenedor que usa flexbox para alinear el contenido */
+.botonNextContainer {
+    display: flex;
+    justify-content: flex-start; /* Alinea a la izquierda */
+    position: absolute;
+    bottom: 20px;  /* Distancia desde la parte inferior */
+    left: 20px;    /* Distancia desde la parte izquierda */
+}

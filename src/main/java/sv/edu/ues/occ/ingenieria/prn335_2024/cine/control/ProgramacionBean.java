@@ -75,11 +75,4 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
             return new ArrayList<>();
         }
     }
-
-    public void remove(Programacion programacion) {
-        if (programacion != null && !em.contains(programacion)) {
-            programacion = em.merge(programacion);
-        }
-        em.remove(programacion);
-    }
 }

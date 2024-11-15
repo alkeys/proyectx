@@ -2,6 +2,7 @@ package sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity;
 
 import jakarta.persistence.*;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -101,5 +102,19 @@ public class Programacion {
 
     public void setReservaList(List<Reserva> reservaList) {
         ReservaList = reservaList;
+    }
+
+    public Duration getDuracion() {
+        if (desde != null && hasta != null) {
+            return Duration.between(desde, hasta);
+        }
+        return Duration.ZERO; // Retorna duración cero si alguna fecha es nula
+    }
+
+    public String getDuracionFormato() {
+        Duration duracion = getDuracion();
+        long horas = duracion.toHours();
+        long minutos = duracion.toMinutes() % 60;
+        return String.format("%d horas %d minutos", horas, minutos);
     }
 }
