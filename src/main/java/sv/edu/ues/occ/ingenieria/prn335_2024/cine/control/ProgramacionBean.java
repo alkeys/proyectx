@@ -10,6 +10,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.TipoReserva;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,22 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
     @Override
     public EntityManager getEntityManager() {
         return em;
+    }
+
+    public List<Programacion> buscarProgramaciones(String query, OffsetDateTime fecha) {
+        // Aquí interactúas con el EntityManager o JPA para obtener los datos
+        // Este es solo un ejemplo simple, adapta según tus necesidades
+
+        // Crear la consulta JPQL
+        String jpql = "SELECT p FROM Programacion p WHERE p.fecha = :fecha AND (LOWER(p.idPelicula.nombre) LIKE :query OR LOWER(p.idSala.nombre) LIKE :query OR LOWER(p.idSucursal.nombre) LIKE :query)";
+
+        // Obtener la lista de programaciones
+        List<Programacion> programaciones = em.createQuery(jpql, Programacion.class)
+                .setParameter("fecha", fecha)
+                .setParameter("query", "%" + query.toLowerCase() + "%")
+                .getResultList();
+
+        return programaciones;
     }
 
     public List<Programacion> buscarProgramaciones(String query) {
