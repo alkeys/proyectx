@@ -4,13 +4,17 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "asiento_caracteristica", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "AsientoCaracteristica.findByIdAsiento",query = "SELECT asiC FROM AsientoCaracteristica asiC WHERE asiC.idAsiento.idAsiento=:idAsiento ORDER BY asiC.idAsientoCaracteristica ASC "),
+        @NamedQuery(name = "AsientoCaracteristica.countByIdAsiento", query = "SELECT COUNT(asiC.idAsientoCaracteristica) FROM AsientoCaracteristica asiC WHERE asiC.idAsiento.idAsiento=:idAsiento")
+})
 public class AsientoCaracteristica {
     @Id
     @Column(name = "id_asiento_caracteristica", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAsientoCaracteristica;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_asiento")
     private Asiento idAsiento;
 
@@ -21,16 +25,6 @@ public class AsientoCaracteristica {
     @Lob
     @Column(name = "valor")
     private String valor;
-
-    public AsientoCaracteristica(Long idAsientoCaracteristica)
-    {
-        this.idAsientoCaracteristica = idAsientoCaracteristica;
-    }
-
-    public AsientoCaracteristica()
-    {
-
-    }
 
     public Long getIdAsientoCaracteristica() {
         return idAsientoCaracteristica;

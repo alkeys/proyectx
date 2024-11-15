@@ -7,15 +7,26 @@ import java.util.List;
 
 @Entity
 @Table(name = "asiento", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "Asiento.findByIdSala",query = "SELECT asi FROM Asiento asi WHERE asi.idSala.idSala=:idSala ORDER BY asi.idAsiento ASC "),
+        @NamedQuery(name = "Asiento.countByIdSala", query = "SELECT COUNT(asi.idAsiento) FROM Asiento asi WHERE asi.idSala.idSala=:idSala")
+})
 public class Asiento {
     @Id
     @Column(name = "id_asiento", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAsiento;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_sala")
     private Sala idSala;
+
+
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "idAsiento")
+    private List<ReservaDetalle> reservaDetalles;
+
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "idAsiento")
+    private List<AsientoCaracteristica> asientoCaracteristicaList;
 
     @Size(max = 155)
     @Column(name = "nombre", length = 155)
@@ -23,17 +34,6 @@ public class Asiento {
 
     @Column(name = "activo")
     private Boolean activo;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "idAsiento")
-    public List<ReservaDetalle> ReservaDetalleList;
-
-    public Asiento( Long idAsiento) {
-        this.idAsiento = idAsiento;
-    }
-
-    public Asiento() {
-
-    }
 
     public Long getIdAsiento() {
         return idAsiento;
@@ -67,11 +67,19 @@ public class Asiento {
         this.activo = activo;
     }
 
-    public List<ReservaDetalle> getReservaDetalleList() {
-        return ReservaDetalleList;
+    public List<ReservaDetalle> getReservaDetalles() {
+        return reservaDetalles;
     }
 
-    public void setReservaDetalleList(List<ReservaDetalle> reservaDetalleList) {
-        ReservaDetalleList = reservaDetalleList;
+    public void setReservaDetalles(List<ReservaDetalle> reservaDetalles) {
+        this.reservaDetalles = reservaDetalles;
+    }
+
+    public List<AsientoCaracteristica> getAsientoCaracteristicaList() {
+        return asientoCaracteristicaList;
+    }
+
+    public void setAsientoCaracteristicaList(List<AsientoCaracteristica> asientoCaracteristicaList) {
+        this.asientoCaracteristicaList = asientoCaracteristicaList;
     }
 }

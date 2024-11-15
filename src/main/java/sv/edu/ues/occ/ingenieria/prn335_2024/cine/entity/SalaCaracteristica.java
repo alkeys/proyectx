@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "sala_caracteristica", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "SalaCaracteristica.findByIdSala",query = "SELECT sc FROM SalaCaracteristica sc WHERE sc.idSala.idSala=:idSala ORDER BY sc.idTipoSala.nombre DESC "),
+        @NamedQuery(name = "SalaCaracteristica.countByIdSala", query = "SELECT COUNT(sc.idSalaCaracteristica) FROM SalaCaracteristica sc WHERE sc.idSala.idSala=:idSala")
+})
 public class SalaCaracteristica {
     @Id
     @Column(name = "id_sala_caracteristica", nullable = false)
@@ -21,15 +25,6 @@ public class SalaCaracteristica {
     @Lob
     @Column(name = "valor")
     private String valor;
-
-    public SalaCaracteristica(Long idSalaCaracteristica) {
-        this.idSalaCaracteristica = idSalaCaracteristica;
-    }
-
-    public SalaCaracteristica() {
-
-    }
-
 
     public Long getIdSalaCaracteristica() {
         return idSalaCaracteristica;

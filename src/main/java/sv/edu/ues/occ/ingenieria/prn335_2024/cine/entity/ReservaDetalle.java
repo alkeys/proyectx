@@ -15,7 +15,7 @@ public class ReservaDetalle {
     @JoinColumn(name = "id_reserva")
     private Reserva idReserva;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_asiento")
     private Asiento idAsiento;
 
