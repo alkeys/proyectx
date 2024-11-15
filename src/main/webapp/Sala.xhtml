@@ -61,6 +61,7 @@
                 <p:tabView id="tabDetalle" cache="false" dynamic="true" rendered="#{frmSala.estado!='NINGUNO'}">
                     <p:ajax process="@this" event="tabChange" listener="#{frmSala.cambiarTab}"/>
 
+                    <p:ajax process="@this" event="tabChange" listener="#{frmSala.frmFM.cargarEventosDelMes}" update="myschedule" />
                     <p:tab id="tabSala" title="Generalidades">
                         <h:panelGrid>
                             <h:form id="frmDetalle" styleClass="detalle" rendered="#{not empty frmSala.registro}">
@@ -260,18 +261,42 @@
                             </h:panelGrid>
                         </h:panelGroup>
                     </p:tab>
+
                     <p:tab id="tabSalaCalendario" title="Programacion">
-                        <p:schedule widgetVar="myschedule"
-                                    locale="es" timeZone="UTC" timeFormat="H(:mm)"
-                        >
-                        </p:schedule>
+                        <h:form id="frmSchedule">
+                            <p:schedule value="#{frmSala.frmFM.eventModel}" widgetVar="myschedule"
+                                        editable="true" locale="es" timeZone="UTC" height="600" hourFormat="24" view="month">
+                                <p:ajax event="dateSelect" listener="#{frmSala.frmFM.onDateSelect}" update="eventDetails"
+                                        oncomplete="PF('eventDialog').show();"/>
+                                <p:ajax event="eventSelect" listener="#{frmSala.frmFM.onEventSelect}" update="eventDetails"
+                                        oncomplete="PF('eventDialog').show();"/>
+                            </p:schedule>
+
+
+                            <p:dialog id="eventDialog" header="Detalles del Evento" widgetVar="eventDialog" modal="true" showEffect="fade" hideEffect="fade">
+                                <h:panelGrid id="eventDeails" columns="2" cellpadding="5">
+                                    <h:outputLabel for="title" value="Título:" style="color: black" />
+                                    <p:inputText id="title" value="#{frmSala.frmFM.event.title}" required="true"/>
+
+                                    <h:outputLabel for="start" value="Fecha de inicio:" style="color: black"/>
+                                    <p:datePicker id="start" value="#{frmSala.frmFM.event.startDate}" required="true">
+                                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="GMT"/>
+                                    </p:datePicker>
+
+                                    <h:outputLabel for="end" value="Fecha de fin:" style="color: black"/>
+                                    <p:datePicker id="end" value="#{frmSala.frmFM.event.endDate}" required="true">
+                                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="GMT"/>
+                                    </p:datePicker>
+                                </h:panelGrid>
+
+                                <p:commandButton value="Guardar" actionListener="#{frmSala.frmFM.addEvent}"
+                                                 oncomplete="PF('eventDialog').hide();" update="myschedule" />
+                                <p:commandButton value="Eliminar" actionListener="#{frmSala.frmFM.deleteEvent}"
+                                                 oncomplete="PF('eventDialog').hide();" update="myschedule" />
+                            </p:dialog>
+                        </h:form>
                     </p:tab>
-
                 </p:tabView>
-
-
-
-
             </h:panelGroup>
         </h:panelGrid>
     </ui:define>
