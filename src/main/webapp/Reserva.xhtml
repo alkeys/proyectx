@@ -26,9 +26,10 @@
                     </h:panelGrid>
 
                     <h:panelGrid columns="2">
-                        <h:outputLabel for="dia" value="Seleccione un Día"/>
-                        <p:calendar id="dia" value="#{frmReserva.diaSleccionado}" pattern="dd/MM/yyyy" required="true">
-                            <p:ajax event="change" listener="#{frmReserva.avanzarPaso}" update="tabs"/>
+                        <h:outputLabel value="Seleccione Día" />
+                        <p:calendar id="fecha" value="#{frmReserva.fechaSeleccionada}" pattern="yyyy-MM-dd" >
+
+                        <p:ajax event="change" listener="#{frmReserva.avanzarPaso}" update="tabs"/>
                         </p:calendar>
                     </h:panelGrid>
                 </p:tab>
@@ -36,27 +37,34 @@
                 <!-- Segunda pestaña: Selección de película -->
               <p:tab title="Funcion" id="tab2">
                   <!--Autocompletado para las funciones-->
-                  <h:outputLabel value="Selecione Funcion"/>
-                  <p:autoComplete id="funciones" value="#{frmReserva.programacionSelecionada}" completeMethod="#{frmReserva.completeFunciones}"
-                                  var="programacion"
-                                  itemLabel="#{programacion.pelicula.nombre} - #{programacion.sala.nombre} - #{programacion.fecha}"
-                                  itemValue="#{programacion}" forceSelection="true"/>
 
-                  <!-- Detalle de película -->
-                  <h:panelGrid columns="2" id="peliculaDetalle">
-                      <h:outputLabel value="Título" />
-                      <h:outputText value="#{frmReserva.peliculaSeleccionadaDetalle.nombre}" />
+                  <h:outputLabel value="Seleccione Pelicula" />
 
+                  <p:autoComplete
+                          id="funciones"
+                          value="#{frmReserva.diaSleccionado}"
+                          completeMethod="#{frmReserva.completeFunciones}"
+                          var="programacion"
+                          itemLabel="#{programacion.idPelicula.nombre} - #{programacion.idSala.nombre} - #{programacion.idSala.idSucursal.nombre} - #{programacion.desde}"
+                          itemValue="#{programacion}"
+                          forceSelection="true"
+                          dropdown="true" />
+
+
+                  <!-- Mostrar los detalles de la película seleccionada -->
+                  <h:panelGrid columns="1">
                       <h:outputLabel value="Sinopsis" />
-                      <h:outputText value="#{frmReserva.peliculaSeleccionadaDetalle.sinopsis}" />
-
-                      <h:outputLabel value="Duración" />
-                      <h:outputText value="#{frmReserva.peliculaSeleccionadaDetalle.duracion}" />
-
-                      <h:outputLabel value="Género" />
-                      <h:outputText value="#{frmReserva.peliculaSeleccionadaDetalle.genero}" />
+                      <h:outputText value="#{frmReserva.peliculaSeleccionada.sinopsis}" rendered="#{not empty frmReserva.peliculaSeleccionada}" />
                   </h:panelGrid>
 
+                  <h4>Caracteristicas</h4>
+                  <h:panelGrid columns="1">
+                      <h:outputLabel value="Duración:" />
+                      <h:outputText value="#{frmReserva.programacionSelecionada.duracionFormato}" rendered="#{not empty frmReserva.peliculaSeleccionada}" />
+
+                      <h:outputLabel value="Genero:" />
+                      <h:outputText value="#{frmReserva.peliculaSeleccionada.peliculaCaracteristicaList}" rendered="#{not empty frmReserva.peliculaSeleccionada}" />
+                  </h:panelGrid>
               </p:tab>
 
                 <!--Tercera pestaña:para la seleccion de asientos-->

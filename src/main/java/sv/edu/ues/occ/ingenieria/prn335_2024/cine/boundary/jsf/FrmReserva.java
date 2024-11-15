@@ -1,6 +1,7 @@
 package sv.edu.ues.occ.ingenieria.prn335_2024.cine.boundary.jsf;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -8,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.AsientoBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.ProgramacionBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.ReservaBean;
@@ -31,12 +33,11 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
 
     private FacesContext facesContext=FacesContext.getCurrentInstance();
 
-    private ProgramacionBean programacionBean;
     private int pasoActual=1;
     private int paso=1;
     private TipoReserva tipoReservaSelecionado;
 
-    private Date diaSleccionado;
+    private String diaSleccionado;
     private Pelicula peliculaSeleccionada;
     private Programacion programacionSelecionada;
     private String detallesPelicula;
@@ -53,6 +54,7 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     private List<Programacion> listaProgramaciones;
     private Pelicula peliculaSeleccionadaDetalle;
     private Reserva reservaConfirmada;
+    private OffsetDateTime fechaSeleccionada;
 
 
     private List<Programacion> programacionesDisponible;
@@ -69,6 +71,8 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     @Inject
     private AsientoBean asientoBean;
 
+    @EJB
+    private ProgramacionBean programacionBean;
 
     private List<Asiento> asientos;
     private List<Pelicula> peliculas;
@@ -175,6 +179,8 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
             asientosDisponibles = asientoBean.obtenerAsientosDisponibles();
         } catch (Exception e) {
             e.printStackTrace();
+            FacesMessage message=new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error al capturar los asientos",e.getMessage());
+            facesContext.addMessage(null,message);
         }
     }
 
@@ -191,17 +197,7 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
             asientosDisponibles.add(asiento);
         }
     }
-    private void reinicarAsistente(){
-        pasoActual=1;
-        setRegistro(null);
-        tipoReservaSelecionado=null;
-        diaSleccionado=null;
-        peliculaSeleccionada=null;
-        programacionSelecionada=null;
-        asientosDisponibles=null;
-        asientosRerservados=null;
-        instanciarRegistro();
-    }
+
 
     public void generarResumen() {
         // Crear un resumen de la reserva, con los detalles de la función, película, asientos reservados, etc.
@@ -228,7 +224,8 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     @PostConstruct
     public void init() {
         listaTipoReserva =obtenerListaTiposReserva(); // Método para obtener los tipos de reserva
-        listaProgramaciones = obtenerProgramaciones(); // Método para obtener las programaciones
+        listaProgramaciones = obtenerProgramaciones();
+        cargarAsientos();// Método para obtener las programaciones
     }
 
 
@@ -241,17 +238,6 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         } catch (Exception e) {
             e.printStackTrace();  // Manejo de excepciones en caso de que ocurra algún error
             return Collections.emptyList();  // Retornar lista vacía si hay un error
-        }
-    }
-
-
-    // Método que se llama cuando se selecciona una programación
-    public void onProgramacionSeleccionada() {
-        if (programacionSelecionada != null) {
-            // Obtener la película asociada con la programación seleccionada
-            peliculaSeleccionadaDetalle = programacionSelecionada.getIdPelicula();
-            // Mostrar el detalle de la película
-            mostrarDetallePelicula = true;
         }
     }
 
@@ -285,16 +271,29 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
      * @return
      */
     public List<Programacion> completeFunciones(String query) {
-        // Asegúrate de que diaSeleccionado y peliculaSeleccionada estén correctamente inicializados
-        if (diaSleccionado != null && peliculaSeleccionada != null) {
-            // Filtrar las programaciones disponibles en base a la película y la fecha seleccionada
-            listaProgramaciones = programacionBean.obtenerProgramacionesPorPeliculaYFecha(String.valueOf(peliculaSeleccionada), diaSleccionado);
-        } else {
-            listaProgramaciones.clear();
-        }
-
-        return listaProgramaciones;
+        System.out.println("Buscando funciones para la película: " + query);
+        return programacionBean.buscarProgramaciones(query, fechaSeleccionada);
     }
+
+
+    // Método que cargaría las funciones para el día seleccionado
+    public void cargarFuncionesDisponibles() {
+        programacionesDisponible = obtenerProgramacionPorFecha(diaSleccionado);
+    }
+
+    private List<Programacion> obtenerFuncionesParaFecha(OffsetDateTime diaSeleccionado) {
+        String jpql = "SELECT p FROM Programacion p WHERE p.desde >= :fechaInicio AND p.desde < :fechaFin";
+        TypedQuery<Programacion> query = em.createQuery(jpql, Programacion.class);
+        OffsetDateTime inicioDia = diaSeleccionado.toLocalDate().atStartOfDay(diaSeleccionado.getOffset()).toOffsetDateTime();
+        OffsetDateTime finDia = inicioDia.plusDays(1).minusSeconds(1);
+
+        query.setParameter("fechaInicio", inicioDia);
+        query.setParameter("fechaFin", finDia);
+
+        return query.getResultList();
+    }
+
+
 
     public void ProgramacionSeleccionada() {
         if (programacionSelecionada!= null) {
@@ -334,31 +333,52 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     }
 
     public void confirmarReserva() {
-        // Validación para asegurarse de que los datos no estén vacíos
-        if (tipoReservaSelecionado == null || peliculaSeleccionada == null || programacionSelecionada == null || asientosReservado == null) {
-            FacesMessage mensajeError = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Por favor, complete todos los campos.");
-            facesContext.addMessage(null, mensajeError);
-            return;
+        try {
+            if (tipoReservaSelecionado ==null || peliculaSeleccionada ==null || programacionSelecionada==null ||asientosReservado.isEmpty()){
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Error","POr favor complete todos los campos"));
+                return;
+            }
+
+            //Crear la Reserva
+            Reserva nuevaReserva=new Reserva();
+            nuevaReserva.setIdTipoReserva(tipoReservaSelecionado);
+            nuevaReserva.setIdProgramacion(programacionSelecionada);
+            nuevaReserva.setFechaReserva(OffsetDateTime.now());
+            nuevaReserva.setObservaciones(comentarios);
+
+            //Persistir la reserva
+            em.getTransaction().begin();
+            em.persist(nuevaReserva);
+            em.getTransaction().commit();
+
+            //Actualizar el estado de los asientos reservados
+            for (Asiento asiento:asientosRerservados){
+                asiento.setActivo(true);
+                em.merge(asiento);
+            }
+
+            //Confirmacion al usuario
+            facesContext.addMessage(null,new FacesMessage( FacesMessage.SEVERITY_INFO,"Reserva confirmada","SU reserva ha sido realizada con exito"));
+            reinicarAsistente();
+        }catch (Exception e){
+            em.getTransaction().rollback();
+            facesContext.addMessage(null,new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error","No se pudoconfirmar la reserva"+e.getMessage()));
+            e.printStackTrace();
         }
-
-        // Crear y guardar la reserva
-        reservaConfirmada = new Reserva();
-        reservaConfirmada.setIdTipoReserva(tipoReservaSelecionado);
-        reservaConfirmada.setIdProgramacion(programacionSelecionada);
-        reservaConfirmada.setFechaReserva(OffsetDateTime.parse(getFechaActual()));
-
-        // Persistir la reserva
-        em.persist(reservaConfirmada);
-
-        // Mensaje de confirmación
-        FacesMessage mensajeConfirmacion = new FacesMessage(FacesMessage.SEVERITY_INFO, "Reserva Confirmada", "¡Tu reserva ha sido confirmada con éxito!");
-        facesContext.addMessage(null, mensajeConfirmacion);
-
-        // Limpiar los campos si es necesario
-        limpiarCamposReserva();
     }
 
-
+    private void reinicarAsistente(){
+        pasoActual=1;
+        setRegistro(null);
+        tipoReservaSelecionado=null;
+        diaSleccionado=null;
+        peliculaSeleccionada=null;
+        programacionSelecionada=null;
+        asientosDisponibles=null;
+        asientosRerservados=null;
+        instanciarRegistro();
+    }
 
     // Método para obtener la fecha actual (puedes ajustarlo según tus necesidades)
     public String getFechaActual() {
@@ -375,6 +395,9 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         asientosReservado= null;
     }
 
+
+
+
     /*
     GETTER Y SETTER PARA PASOACTUAL .ETC
      */
@@ -386,11 +409,11 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         this.pasoActual = pasoActual;
     }
 
-    public Date getDiaSleccionado() {
+    public String getDiaSleccionado() {
         return diaSleccionado;
     }
 
-    public void setDiaSleccionado(Date diaSleccionado) {
+    public void setDiaSleccionado(String diaSleccionado) {
         this.diaSleccionado = diaSleccionado;
     }
 
@@ -518,4 +541,18 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     public void setPeliculas(List<Pelicula> peliculas) {
         this.peliculas = peliculas;
     }
+
+
+    public Object getProgramacionSeleccionada() {
+        return programacionSelecionada;
+    }
+
+    public OffsetDateTime getFechaSeleccionada() {
+        return fechaSeleccionada;
+    }
+
+    public void setFechaSeleccionada(OffsetDateTime fechaSeleccionada) {
+        this.fechaSeleccionada = fechaSeleccionada;
+    }
+
 }

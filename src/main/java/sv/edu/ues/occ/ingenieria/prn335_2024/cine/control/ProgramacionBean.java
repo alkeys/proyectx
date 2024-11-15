@@ -4,11 +4,13 @@ import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Pelicula;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Programacion;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.TipoReserva;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +46,7 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
     public List<Pelicula> obtenerTodasLasPeliculas(String fecha) {
         // Consultamos la base de datos para obtener todas las películas
         String jpql = "SELECT p FROM Pelicula p";
-        return em.createQuery(jpql, Pelicula.class).getResultList();
+        return em.createQuery(jpql, sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Pelicula.class).getResultList();
     }
 
     public List<Programacion> obtenerProgramaciones(String fecha) {
@@ -61,15 +63,37 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
         }
     }
     // Método para obtener las programaciones filtradas por película y fecha
-    public List<Programacion> obtenerProgramacionesPorPeliculaYFecha(String nombrePelicula, Date fecha) {
-        String query = "SELECT p FROM Programacion p " +
-                "JOIN p.pelicula peli " +
-                "WHERE peli.nombre LIKE :nombrePelicula AND p.fecha = :fecha";
-        return em.createQuery(query, Programacion.class)
-                .setParameter("nombrePelicula", "%" + nombrePelicula + "%")
-                .setParameter("fecha", fecha)
+    public List<Programacion> obtenerProgramacionesPorPeliculaYFecha(String Pelicula, Date fecha) {
+        String jpql="SELECT p FROM Programacion p WHERE p.idPelicula = :pelicula AND p.desde <= :fecha AND p.hasta >= :fecha";
+        return em.createQuery(jpql,Programacion.class)
+                .setParameter("pelicula",Pelicula)
+                .setParameter("fecha",fecha)
                 .getResultList();
     }
+
+    public List<Programacion> buscarProgramaciones(String query, OffsetDateTime fecha) {
+        String jpql = "SELECT p FROM Programacion p " +
+                "WHERE p.idPelicula.nombre LIKE :query";
+
+        if (fecha != null) {
+            jpql += " AND p.desde >= :fechaInicio AND p.desde < :fechaFin";
+        }
+
+        // Imprime la consulta generada para depuración
+        System.out.println("Consulta JPQL: " + jpql);
+
+        // Realizamos la consulta
+        TypedQuery<Programacion> queryResult = em.createQuery(jpql, Programacion.class)
+                .setParameter("query", "%" + query + "%");
+
+        if (fecha != null) {
+            queryResult.setParameter("fechaInicio", fecha.toLocalDate().atStartOfDay(fecha.getOffset()))
+                    .setParameter("fechaFin", fecha.toLocalDate().plusDays(1).atStartOfDay(fecha.getOffset()));
+        }
+
+        return queryResult.getResultList();
+    }
+
 
 
 }
