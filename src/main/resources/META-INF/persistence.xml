@@ -29,5 +29,6 @@
     <class>sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.SalaCaracteristica</class>
     <class>sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Sucursal</class>
 
+
 </persistence-unit>
 </persistence>
