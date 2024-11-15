@@ -102,9 +102,11 @@ public class FrmMF extends  AbstractPfFrm<Programacion> implements Serializable 
             Logger.getLogger(FrmMF.class.getName()).log(Level.SEVERE, null, e);
         }
     }
+
     public List<Programacion> cargarDatos(){
         return programacionBean.findRange(0, Integer.MAX_VALUE);
     }
+
     public String getServerTimeZone() {
         return serverTimeZone;
     }
@@ -114,6 +116,7 @@ public class FrmMF extends  AbstractPfFrm<Programacion> implements Serializable 
     public void setProgramacions(List<Programacion> programacions) {
         this.programacions = programacions;
     }
+
     public  void setEventModel(ScheduleModel eventModel){
         this.eventModel = eventModel;
     }
@@ -145,35 +148,46 @@ public class FrmMF extends  AbstractPfFrm<Programacion> implements Serializable 
         event = new DefaultScheduleEvent();
     }
 
+
     public void cargarEventosDelMes() {
         LocalDate inicioDelMes = LocalDate.now().withDayOfMonth(1);
         LocalDate finDelMes = inicioDelMes.plusMonths(1).minusDays(1);
 
-        for (LocalDate date = inicioDelMes; !date.isAfter(finDelMes); date = date.plusDays(1)) {
-            ScheduleEvent<?> event =  DefaultScheduleEvent.builder()
-                    .title("Evento del día " + date.getDayOfMonth())
-                    .startDate(date.atStartOfDay())
-                    .endDate(date.atStartOfDay().plusDays(1))
-                    .build();
-            eventModel.addEvent(event);
+        List<Programacion> programacionesDelMes = programacionBean.findProgramacionesEntreFechas(
+                inicioDelMes.atStartOfDay(), finDelMes.atTime(23, 59, 59));
+
+        for (Programacion programacion : programacionesDelMes) {
+            LocalDateTime desde = programacion.getDesde().toLocalDateTime();
+            LocalDateTime hasta = programacion.getHasta().toLocalDateTime();
+
+            if (desde != null && hasta != null) {
+                ScheduleEvent<?> event = DefaultScheduleEvent.builder()
+                        .title("Sala " + programacion.getIdSala().getIdSala() + " - Película " + programacion.getIdPelicula().getIdPelicula())
+                        .startDate(desde)
+                        .endDate(hasta)
+                        .description(programacion.getComentarios())
+                        .build();
+                eventModel.addEvent(event);
+            }
         }
     }
-    public void onEventSelect(SelectEvent<ScheduleEvent<?>> selectEvent) {
-        event = selectEvent.getObject();
-    }
 
-    public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
-        event = DefaultScheduleEvent.builder()
+        public void onEventSelect(SelectEvent<ScheduleEvent<?>> selectEvent) {
+            event = selectEvent.getObject();
+        }
+
+        public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
+            event = DefaultScheduleEvent.builder()
                 .startDate(selectEvent.getObject())
                 .endDate(selectEvent.getObject().plusHours(1))
                 .build();
-    }
+        }
 
-    public void setProgramacionBean(ProgramacionBean programacionBean) {
-        this.programacionBean = programacionBean;
-    }
+        public void setProgramacionBean(ProgramacionBean programacionBean) {
+            this.programacionBean = programacionBean;
+        }
 
-    public void setFacesContext(FacesContext facesContext) {
-        this.facesContext = facesContext;
-    }
+        public void setFacesContext(FacesContext facesContext) {
+            this.facesContext = facesContext;
+        }
 }

@@ -9,6 +9,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Programacion;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.TipoReserva;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,5 +75,20 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    public void remove(Programacion programacion) {
+        if (programacion != null && !em.contains(programacion)) {
+            programacion = em.merge(programacion);
+        }
+        em.remove(programacion);
+    }
+
+    public List<Programacion> findProgramacionesEntreFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        String jpql = "SELECT p FROM Programacion p WHERE p.desde >= :fechaInicio AND p.hasta <= :fechaFin";
+        return em.createQuery(jpql, Programacion.class)
+                .setParameter("fechaInicio", fechaInicio)
+                .setParameter("fechaFin", fechaFin)
+                .getResultList();
     }
 }

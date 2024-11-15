@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="jakarta.faces.facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -8,10 +6,7 @@
                 template="WEB-INF/templates/principal.xhtml"
                 xmlns:crud="jakarta.faces.composite/crud"
                 xmlns:f="jakarta.faces.core"
-
 >
-
-
     <ui:define name="titulo">
         #{frmSala.tituloPag}
 
@@ -61,7 +56,6 @@
                 <p:tabView id="tabDetalle" cache="false" dynamic="true" rendered="#{frmSala.estado!='NINGUNO'}">
                     <p:ajax process="@this" event="tabChange" listener="#{frmSala.cambiarTab}"/>
 
-                    <p:ajax process="@this" event="tabChange" listener="#{frmSala.frmFM.cargarEventosDelMes}" update="myschedule" />
                     <p:tab id="tabSala" title="Generalidades">
                         <h:panelGrid>
                             <h:form id="frmDetalle" styleClass="detalle" rendered="#{not empty frmSala.registro}">
@@ -101,7 +95,6 @@
                     </p:tab>
 
                     <p:tab title="Características" disabled="#{frmSala.estado != 'MODIFICAR'}">
-
 
                         <h:panelGrid>
                             <h:panelGroup id="pnlTablaC">
@@ -262,8 +255,12 @@
                         </h:panelGroup>
                     </p:tab>
 
+
+
                     <p:tab id="tabSalaCalendario" title="Programacion">
+
                         <h:form id="frmSchedule">
+                            <h:outputText value="Programacion para  #{frmSala.registro.nombre} " styleClass="calendar-title"/>
                             <p:schedule value="#{frmSala.frmFM.eventModel}" widgetVar="myschedule"
                                         editable="true" locale="es" timeZone="UTC" height="600" hourFormat="24" view="month">
                                 <p:ajax event="dateSelect" listener="#{frmSala.frmFM.onDateSelect}" update="eventDetails"
@@ -271,7 +268,6 @@
                                 <p:ajax event="eventSelect" listener="#{frmSala.frmFM.onEventSelect}" update="eventDetails"
                                         oncomplete="PF('eventDialog').show();"/>
                             </p:schedule>
-
 
                             <p:dialog id="eventDialog" header="Detalles del Evento" widgetVar="eventDialog" modal="true" showEffect="fade" hideEffect="fade">
                                 <h:panelGrid id="eventDeails" columns="2" cellpadding="5">
