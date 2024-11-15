@@ -10,6 +10,7 @@ import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.TipoReserva;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @LocalBean
@@ -40,22 +41,6 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
                 .getResultList();
     }
 
-    public List<Programacion> obtenerProgramaciones(TipoReserva tipoReserva, String diaSeleccionado) {
-        // Aquí interactúas con el EntityManager o JPA para obtener los datos
-        // Este es solo un ejemplo simple, adapta según tus necesidades
-
-        // Crear la consulta JPQL
-        String jpql = "SELECT p FROM Programacion p WHERE p.idTipoReserva = :tipoReserva AND p.fecha = :diaSeleccionado";
-
-        // Obtener la lista de programaciones
-        List<Programacion> programaciones = em.createQuery(jpql, Programacion.class)
-                .setParameter("tipoReserva", tipoReserva)
-                .setParameter("diaSeleccionado", diaSeleccionado)
-                .getResultList();
-
-        return programaciones;
-    }
-
     public List<Pelicula> obtenerTodasLasPeliculas(String fecha) {
         // Consultamos la base de datos para obtener todas las películas
         String jpql = "SELECT p FROM Pelicula p";
@@ -75,4 +60,16 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
             return new ArrayList<>();
         }
     }
+    // Método para obtener las programaciones filtradas por película y fecha
+    public List<Programacion> obtenerProgramacionesPorPeliculaYFecha(String nombrePelicula, Date fecha) {
+        String query = "SELECT p FROM Programacion p " +
+                "JOIN p.pelicula peli " +
+                "WHERE peli.nombre LIKE :nombrePelicula AND p.fecha = :fecha";
+        return em.createQuery(query, Programacion.class)
+                .setParameter("nombrePelicula", "%" + nombrePelicula + "%")
+                .setParameter("fecha", fecha)
+                .getResultList();
+    }
+
+
 }

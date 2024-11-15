@@ -8,15 +8,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.AsientoBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.ProgramacionBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.ReservaBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.control.TipoReservaBean;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.*;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -28,25 +30,48 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     private EntityManager em;
 
     private FacesContext facesContext=FacesContext.getCurrentInstance();
-    private ReservaBean reservaBean;
+
     private ProgramacionBean programacionBean;
     private int pasoActual=1;
-    private Integer paso=0;
+    private int paso=1;
     private TipoReserva tipoReservaSelecionado;
 
-    private String diaSleccionado;
+    private Date diaSleccionado;
     private Pelicula peliculaSeleccionada;
     private Programacion programacionSelecionada;
     private String detallesPelicula;
+    private List<Asiento> asientosDisponible;
+    private List<Asiento> asientosReservado;
+
+    private Asiento asientoSelecionado;
+    private String comentarios;
+
+
     private List<Asiento> asientosDisponibles;
     private List<Asiento> asientosRerservados;
     private List<TipoReserva> listaTipoReserva;
     private List<Programacion> listaProgramaciones;
+    private Pelicula peliculaSeleccionadaDetalle;
+    private Reserva reservaConfirmada;
+
 
     private List<Programacion> programacionesDisponible;
+    private boolean mostrarDetallePelicula = false;
+
+    private List<Long> asientosReservadosIds;
 
     @Inject
     private TipoReservaBean tipoReservaBean;
+
+    @Inject
+    private ReservaBean reservaBean;
+
+    @Inject
+    private AsientoBean asientoBean;
+
+
+    private List<Asiento> asientos;
+    private List<Pelicula> peliculas;
 
     @Override
     public FacesContext getFacesContext(){
@@ -75,7 +100,12 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
 
     public FrmReserva() {
         this.reservaBean=new ReservaBean();
+        this.asientosDisponibles = new ArrayList<>();
+        this.asientosReservado = new ArrayList<>();
+        cargarAsientos();
     }
+
+
 
     // Método para obtener la lista de tipos de reserva
     public List<TipoReserva> getListaTipoReserva(){
@@ -90,36 +120,14 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         return em.createQuery("SELECT t FROM TipoReserva t", TipoReserva.class)
                 .getResultList();
     }
-
-
-    public List<Pelicula> autocompleteFunciones(String query) {
-        List<Pelicula> resultados = new ArrayList<>();
-
-        if (diaSleccionado != null) {
-            List<Programacion> programaciones = obtenerProgramacionPorFecha(diaSleccionado);
-
-            // Filtramos las películas que coincidan con la consulta
-            for (Programacion programacion : programaciones) {
-                Pelicula pelicula = programacion.getIdPelicula();  // Suponiendo que Programacion tiene una relación ManyToOne con Pelicula
-                String salaYHorario = programacion.getIdSala().getNombre() + " ("
-                        + programacion.getDesde() + " - " + programacion.getHasta() + ")";
-                if (pelicula.getNombre().toLowerCase().contains(query.toLowerCase())) {
-                    pelicula.setAutocompletado(salaYHorario);  // Suponiendo que tienes un método para agregar el texto de la sala y horario
-                    resultados.add(pelicula);
-                }
-            }
-        }
-        return resultados;
-    }
-
-
-
     // Método para obtener programaciones en función de la fecha seleccionada
     private List<Programacion> obtenerProgramacionPorFecha(String fecha) {
         // Aquí deberías implementar la lógica de consulta a la base de datos
         // para obtener todas las programaciones en la fecha seleccionada
         return programacionBean.obtenerProgramaciones(fecha); // Ejemplo
     }
+
+
     public Integer getPaso() {
         return paso;
     }
@@ -128,47 +136,26 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         this.paso = paso;
     }
 
-    // Método para avanzar al siguiente paso
     public void avanzarPaso() {
-        if (paso< 1) {
+        if (paso< 3) {
             paso ++;
         }
     }
 
+    public void irAPestanaAnterior() {
+        if (paso > 0) {
+            paso--; // Cambia a la pestaña anterior
+        }
+    }
 
+
+
+    // Método para avanzar al siguiente paso
     public void retrocederPaso(){
         pasoActual--;
     }
 
-    private void cargarDatosPaso(){
-        switch (paso){
-            case 2:
-                cargarFunciones();
-                break;
-            case 3:
-                cargarAsientosDisponibles();
-                break;
-            case 4:
-                generarResumen();
-                break;
-            default:
-                break;
-        }
-    }
 
-    private void cargarFunciones(){
-        if (tipoReservaSelecionado !=null && diaSleccionado!=null){
-            try {
-                List<Programacion> programacions=reservaBean.findProgramacionPorDia(tipoReservaSelecionado,diaSleccionado);
-                if (!programacions.isEmpty()){
-                    programacionSelecionada=programacions.get(0);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-
-    }
     public List<Asiento> obtenerAsientosDisponibles(Programacion programacionSeleccionada) {
         if (programacionSeleccionada != null) {
             // Accedemos a la sala de la programación seleccionada
@@ -183,15 +170,12 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         return new ArrayList<>();
     }
 
-    private void cargarAsientosDisponibles(){
+    public void cargarAsientos() {
         try {
-            if (programacionSelecionada !=null){
-                asientosDisponibles=obtenerAsientosDisponibles(programacionSelecionada);
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
+            asientosDisponibles = asientoBean.obtenerAsientosDisponibles();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
     private void reservarAsiento(Asiento asiento){
@@ -207,23 +191,6 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
             asientosDisponibles.add(asiento);
         }
     }
-    public void confirmarReserva(){
-        try {
-            crearReserva(getRegistro(), asientosRerservados);
-            FacesMessage msg=new FacesMessage(FacesMessage.SEVERITY_INFO,"Reserva confirmada",
-                    "La reserva ha sido creada exitosamente.");
-            facesContext.addMessage(null,msg);
-            reinicarAsistente();
-        }catch (Exception e){
-            FacesMessage msg=new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error al confirmar la reserva",e.getMessage());
-            facesContext.addMessage(null,msg);
-        }
-    }
-
-    private void crearReserva(Reserva reserva, List<Asiento> asientos){
-        getDataAccess().create(reserva);
-    }
-
     private void reinicarAsistente(){
         pasoActual=1;
         setRegistro(null);
@@ -265,6 +232,149 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
     }
 
 
+    private List<Programacion> obtenerProgramaciones() {
+        // Realizar una consulta JPQL para obtener las programaciones
+        try {
+            // Suponiendo que las programaciones se ordenan por fecha (por ejemplo 'desde')
+            return em.createQuery("SELECT p FROM Programacion p WHERE p.hasta >= CURRENT_TIMESTAMP ORDER BY p.desde ASC", Programacion.class)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();  // Manejo de excepciones en caso de que ocurra algún error
+            return Collections.emptyList();  // Retornar lista vacía si hay un error
+        }
+    }
+
+
+    // Método que se llama cuando se selecciona una programación
+    public void onProgramacionSeleccionada() {
+        if (programacionSelecionada != null) {
+            // Obtener la película asociada con la programación seleccionada
+            peliculaSeleccionadaDetalle = programacionSelecionada.getIdPelicula();
+            // Mostrar el detalle de la película
+            mostrarDetallePelicula = true;
+        }
+    }
+
+    // Método para reservar un asiento
+    public void reservarAsiento() {
+        if (asientoSelecionado != null && !asientosReservadosIds.contains(asientoSelecionado.getIdAsiento())) {
+            // Agregar el asiento a la lista de reservados
+            asientosReservadosIds.add(asientoSelecionado.getIdAsiento());
+            asientosDisponibles.remove(asientoSelecionado);
+            asientosReservado.add(asientoSelecionado);
+            // Aquí puedes actualizar en la base de datos si es necesario
+        }
+    }
+
+    // Método para eliminar una reserva
+    public void eliminarReserva() {
+        if (asientoSelecionado != null && asientosReservadosIds.contains(asientoSelecionado.getIdAsiento())) {
+            // Eliminar el asiento de la lista de reservados
+            asientosReservadosIds.remove(asientoSelecionado.getIdAsiento());
+            asientosReservado.remove(asientoSelecionado);
+            asientosDisponibles.add(asientoSelecionado);
+            // Aquí puedes actualizar en la base de datos si es necesario
+        }
+    }
+
+
+
+
+    /**
+     * Metodo para autocompletar funciones basadas en la pelicula y la fecha seleci
+     * @return
+     */
+    public List<Programacion> completeFunciones(String query) {
+        // Asegúrate de que diaSeleccionado y peliculaSeleccionada estén correctamente inicializados
+        if (diaSleccionado != null && peliculaSeleccionada != null) {
+            // Filtrar las programaciones disponibles en base a la película y la fecha seleccionada
+            listaProgramaciones = programacionBean.obtenerProgramacionesPorPeliculaYFecha(String.valueOf(peliculaSeleccionada), diaSleccionado);
+        } else {
+            listaProgramaciones.clear();
+        }
+
+        return listaProgramaciones;
+    }
+
+    public void ProgramacionSeleccionada() {
+        if (programacionSelecionada!= null) {
+            // Obtener la película asociada con la programación seleccionada
+            peliculaSeleccionadaDetalle = programacionSelecionada.getIdPelicula();
+        }
+    }
+
+    public void generarResumenReserva() {
+        // Crear un resumen de la reserva, con los detalles de la función, película, asientos reservados, etc.
+        StringBuilder resumen = new StringBuilder();
+
+        // Información básica de la reserva
+        resumen.append("Resumen de la Reserva:\n")
+                .append("Tipo de Reserva: ").append(tipoReservaSelecionado != null ? tipoReservaSelecionado.getNombre() : "No especificado").append("\n")
+                .append("Fecha de Reserva: ").append(getRegistro().getFechaReserva()).append("\n")
+                .append("Película: ").append(peliculaSeleccionada != null ? peliculaSeleccionada.getNombre() : "No seleccionada").append("\n")
+                .append("Sala: ").append(programacionSelecionada != null ? programacionSelecionada.getIdSala().getNombre() : "No especificada").append("\n")
+                .append("Horario: ").append(programacionSelecionada != null ? programacionSelecionada.getDesde() + " - " + programacionSelecionada.getHasta() : "No disponible").append("\n");
+
+        // Asientos reservados
+        if (asientosRerservados != null && !asientosRerservados.isEmpty()) {
+            resumen.append("Asientos Reservados:\n");
+            for (Asiento asiento : asientosRerservados) {
+                resumen.append(" - Asiento: ").append(asiento.getNombre()).append("\n");
+            }
+        } else {
+            resumen.append("No se han reservado asientos.\n");
+        }
+
+        // Mensaje de confirmación
+        resumen.append("\n¡Gracias por realizar tu reserva!");
+
+        // Mostrar el resumen en la interfaz de usuario, por ejemplo, como un mensaje de información en la pantalla
+        FacesMessage mensajeResumen = new FacesMessage(FacesMessage.SEVERITY_INFO, "Resumen de la Reserva", resumen.toString());
+        facesContext.addMessage(null, mensajeResumen);
+    }
+
+    public void confirmarReserva() {
+        // Validación para asegurarse de que los datos no estén vacíos
+        if (tipoReservaSelecionado == null || peliculaSeleccionada == null || programacionSelecionada == null || asientosReservado == null) {
+            FacesMessage mensajeError = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Por favor, complete todos los campos.");
+            facesContext.addMessage(null, mensajeError);
+            return;
+        }
+
+        // Crear y guardar la reserva
+        reservaConfirmada = new Reserva();
+        reservaConfirmada.setIdTipoReserva(tipoReservaSelecionado);
+        reservaConfirmada.setIdProgramacion(programacionSelecionada);
+        reservaConfirmada.setFechaReserva(OffsetDateTime.parse(getFechaActual()));
+
+        // Persistir la reserva
+        em.persist(reservaConfirmada);
+
+        // Mensaje de confirmación
+        FacesMessage mensajeConfirmacion = new FacesMessage(FacesMessage.SEVERITY_INFO, "Reserva Confirmada", "¡Tu reserva ha sido confirmada con éxito!");
+        facesContext.addMessage(null, mensajeConfirmacion);
+
+        // Limpiar los campos si es necesario
+        limpiarCamposReserva();
+    }
+
+
+
+    // Método para obtener la fecha actual (puedes ajustarlo según tus necesidades)
+    public String getFechaActual() {
+        // Obtén la fecha actual del sistema (esto es solo un ejemplo)
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date());
+    }
+
+    // Método para limpiar los campos de la reserva después de confirmar
+    private void limpiarCamposReserva() {
+        tipoReservaSelecionado = null;
+        peliculaSeleccionada = null;
+        programacionSelecionada = null;
+        asientosReservado= null;
+    }
+
     /*
     GETTER Y SETTER PARA PASOACTUAL .ETC
      */
@@ -276,13 +386,11 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         this.pasoActual = pasoActual;
     }
 
-
-
-    public String getDiaSleccionado() {
+    public Date getDiaSleccionado() {
         return diaSleccionado;
     }
 
-    public void setDiaSleccionado(String diaSleccionado) {
+    public void setDiaSleccionado(Date diaSleccionado) {
         this.diaSleccionado = diaSleccionado;
     }
 
@@ -331,58 +439,83 @@ public class FrmReserva extends AbstractfrmImplementacion<Reserva> implements Se
         this.tipoReservaSelecionado = tipoReservaSelecionado;
     }
 
-    public void mostrarDetallesPelicula() {
-        if (peliculaSeleccionada != null) {
-            // Mostrar detalles de la película seleccionada
-            System.out.println("Detalles de la película seleccionada:");
-            System.out.println("Nombre: " + peliculaSeleccionada.getNombre());
-            System.out.println("Sinopsis: " + peliculaSeleccionada.getSinopsis());
-
-            // Si tienes otros detalles, puedes agregarlos aquí
-            // Ejemplo: Mostrar la lista de características de la película
-            if (peliculaSeleccionada.getPeliculaCaracteristicaList() != null) {
-                System.out.println("Características de la película:");
-                for (PeliculaCaracteristica caracteristica : peliculaSeleccionada.getPeliculaCaracteristicaList()) {
-                    System.out.println(" - " + caracteristica.getIdPeliculaCaracteristica());
-                }
-            }
-        } else {
-            System.out.println("No se ha seleccionado ninguna película.");
-        }
+    public List<Programacion> getListaProgramaciones() {
+        return listaProgramaciones;
     }
 
-
-    // Método que obtiene las programaciones de la base de datos
-    public void listaProgramaciones() {
-        try {
-            if (tipoReservaSelecionado != null && diaSleccionado != null) {
-                listaProgramaciones = programacionBean.obtenerProgramaciones(tipoReservaSelecionado,diaSleccionado);
-            }
-        } catch (Exception e) {
-            // Manejo de errores, si es necesario
-            e.printStackTrace();
-        }
+    public void setListaProgramaciones(List<Programacion> listaProgramaciones) {
+        this.listaProgramaciones = listaProgramaciones;
     }
 
-    public List<Programacion> obtenerProgramacionPorFecha(LocalDate diaSeleccionado) {
-        // Asegúrate de que entityManager esté configurado correctamente
-        String query = "SELECT p FROM Programacion p WHERE p.desde >= :diaSeleccionado AND p.hasta <= :diaSeleccionado";
-        return em.createQuery(query, Programacion.class)
-                .setParameter("diaSeleccionado", diaSeleccionado)
-                .getResultList();
+    public Pelicula getPeliculaSeleccionadaDetalle() {
+        return peliculaSeleccionadaDetalle;
     }
 
-    private List<Programacion> obtenerProgramaciones() {
-        // Realizar una consulta JPQL para obtener las programaciones
-        try {
-            // Suponiendo que las programaciones se ordenan por fecha (por ejemplo 'desde')
-            return em.createQuery("SELECT p FROM Programacion p WHERE p.hasta >= CURRENT_TIMESTAMP ORDER BY p.desde ASC", Programacion.class)
-                    .getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();  // Manejo de excepciones en caso de que ocurra algún error
-            return Collections.emptyList();  // Retornar lista vacía si hay un error
-        }
+    public void setPeliculaSeleccionadaDetalle(Pelicula peliculaSeleccionadaDetalle) {
+        this.peliculaSeleccionadaDetalle = peliculaSeleccionadaDetalle;
     }
 
+    public boolean isMostrarDetallePelicula() {
+        return mostrarDetallePelicula;
+    }
 
+    public void setMostrarDetallePelicula(boolean mostrarDetallePelicula) {
+        this.mostrarDetallePelicula = mostrarDetallePelicula;
+    }
+
+    public List<Long> getAsientosReservadosIds() {
+        return asientosReservadosIds;
+    }
+
+    public List<Asiento> getAsientosReservado() {
+        return asientosReservado;
+    }
+
+    public void setAsientosReservado(List<Asiento> asientosReservado) {
+        this.asientosReservado = asientosReservado;
+    }
+
+    public void setAsientosReservadosIds(List<Long> asientosReservadosIds) {
+        this.asientosReservadosIds = asientosReservadosIds;
+    }
+
+    public List<Asiento> getAsientosDisponible() {
+        return asientosDisponible;
+    }
+
+    public void setAsientosDisponible(List<Asiento> asientosDisponible) {
+        this.asientosDisponible = asientosDisponible;
+    }
+
+    public Asiento getAsientoSelecionado() {
+        return asientoSelecionado;
+    }
+
+    public void setAsientoSelecionado(Asiento asientoSelecionado) {
+        this.asientoSelecionado = asientoSelecionado;
+    }
+
+    public Reserva getReservaConfirmada() {
+        return reservaConfirmada;
+    }
+
+    public void setReservaConfirmada(Reserva reservaConfirmada) {
+        this.reservaConfirmada = reservaConfirmada;
+    }
+
+    public List<Asiento> getAsientos() {
+        return asientos;
+    }
+
+    public void setAsientos(List<Asiento> asientos) {
+        this.asientos = asientos;
+    }
+
+    public List<Pelicula> getPeliculas() {
+        return peliculas;
+    }
+
+    public void setPeliculas(List<Pelicula> peliculas) {
+        this.peliculas = peliculas;
+    }
 }

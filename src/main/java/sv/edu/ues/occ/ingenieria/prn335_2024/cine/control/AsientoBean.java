@@ -53,4 +53,19 @@ public class AsientoBean extends AbstractDataPersistence<Asiento> implements Ser
         }
         return List.of();
     }
+
+    /**
+     * Obtiene la lista de asientos disponibles para reservar.
+     * Un asiento es considerado disponible si está activo y no tiene una reserva asociada.
+     *
+     * @return Lista de asientos disponibles
+     */
+    public List<Asiento> obtenerAsientosDisponibles() {
+        TypedQuery<Asiento> query = em.createQuery(
+                "SELECT a FROM Asiento a WHERE a.activo = true AND NOT EXISTS " +
+                        "(SELECT r FROM Reserva r WHERE r.asiento = a)", Asiento.class);
+        return query.getResultList();
+    }
+
+
 }
