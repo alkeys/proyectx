@@ -28,6 +28,7 @@ public class Pelicula {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "idPelicula")
     public List<Programacion> ProgramacionList;
 
+    @Transient
     private String autocompletado;
 
     public Pelicula (long idPelicula)
@@ -38,7 +39,6 @@ public class Pelicula {
 {
 
 }
-
     public Long getIdPelicula() {
         return idPelicula;
     }
