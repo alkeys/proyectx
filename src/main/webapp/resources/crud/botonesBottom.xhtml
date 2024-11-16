@@ -24,16 +24,16 @@
 
     <cc:implementation>
         <h:panelGrid columns="3">
-            <p:commandButton value="Guardar"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.key']}"
                              update="#{cc.attrs.refrescar}"
                              actionListener="#{cc.attrs.frm.btnGuardarHandler}">
             </p:commandButton>
-            <p:commandButton value="Eliminar"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']}"
                              update="#{cc.attrs.refrescar}"
                              actionListener="#{cc.attrs.frm.btnEliminarHandler}"
                              styleClass="ui-button-danger">
             </p:commandButton>
-            <p:commandButton value="Modificar"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.update']}"
                              update="#{cc.attrs.refrescar}"
                              actionListener="#{cc.attrs.frm.btnModificarHandler}">
             </p:commandButton>

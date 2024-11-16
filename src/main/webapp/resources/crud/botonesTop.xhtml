@@ -23,19 +23,16 @@
     <cc:implementation>
         <p:growl life="5000"/>
         <h:panelGrid columns="#{cc.attrs.frm.estado!='NINGUNO'?'2':'1'}">
-            <p:commandButton value="Nuevo #{cc.attrs.frm.tituloPag}"
-                             ajax="true"
-                             process="@this"
-                             update="#{cc.attrs.actualizar}"
+            <p:commandButton ajax="true"
                              actionListener="#{cc.attrs.frm.btnNuevoHandler}"
+                             value="#{abstractfrmimplementacion['abstractfrmimplementacion.new']} #{cc.attrs.frm.tituloPag}"
+                             process="@this" update="#{cc.attrs.actualizar}"
             />
-            <p:commandButton
-                    value="Cancelar #{cc.attrs.frm.tituloPag}"
-                    ajax="true"
-                    actionListener="#{cc.attrs.frm.btnCancelarHandler}"
-                    update="#{cc.attrs.actualizar}"
-                    process="@this"
-                    rendered="#{cc.attrs.frm.estado != 'NINGUNO'}"
+            <p:commandButton ajax="true"
+                             actionListener="#{cc.attrs.frm.btnCancelarHandler}"
+                             value="#{abstractfrmimplementacion['abstractfrmimplementacion.cancel']} #{cc.attrs.frm.tituloPag}"
+                             process="@this" update="#{cc.attrs.actualizar}"
+                             rendered="#{cc.attrs.frm.estado!='NINGUNO'}"
             />
         </h:panelGrid>
     </cc:implementation>

@@ -20,19 +20,19 @@
     </cc:interface>
     <cc:implementation>
         <h:panelGrid columns="#{cc.attrs.frm.estado=='CREAR'?'1':'2'}" ajax="true">
-            <p:commandButton value="Crear #{cc.attrs.frm.tituloPag}"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.create']} #{cc.attrs.frm.tituloPag}"
                              process="@form"
                              update="#{cc.attrs.actualizar}"
                              actionListener="#{cc.attrs.frm.btnCrearHandler}"
                              rendered="#{cc.attrs.frm.estado == 'CREAR'}"
             />
-            <p:commandButton value="Modificar #{cc.attrs.frm.tituloPag}" ajax="true"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.modify']} #{cc.attrs.frm.tituloPag}" ajax="true"
                              process="@form"
                              update="#{cc.attrs.actualizar}"
                              actionListener="#{cc.attrs.frm.btnModificarHandler}"
                              rendered="#{cc.attrs.frm.estado == 'MODIFICAR'}"
             />
-            <p:commandButton value="Eliminar #{cc.attrs.frm.tituloPag}" ajax="true"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']} #{cc.attrs.frm.tituloPag}" ajax="true"
                              process="@form"
                              update="#{cc.attrs.actualizar}"
                              actionListener="#{cc.attrs.frm.btnEliminarHandler}"

@@ -12,7 +12,7 @@
         </locale-config>
         <resource-bundle>
             <base-name>Traducciones</base-name>
-            <var>abstractfrm</var>
+            <var>abstractfrmimplementacion</var>
         </resource-bundle>
     </application>
 </faces-config>

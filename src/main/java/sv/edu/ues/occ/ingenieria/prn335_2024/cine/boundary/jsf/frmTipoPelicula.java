@@ -99,20 +99,20 @@ public class frmTipoPelicula implements Serializable {
         tpeliBean.create(registro);
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos guardados exitosamente", null);
         facesContext.addMessage(null, mensaje);
-
+        this.registro = null;
     }
 
     public void btnEliminarHandler(ActionEvent ae) {
         tpeliBean.delete(registro);
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado exitosamente", null);
         facesContext.addMessage(null, mensaje);
-
+        this.registro = null;
     }
 
     public void btnModificarHandler(ActionEvent ae) {
         tpeliBean.update(registro);
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Modificado exitosamente", null);
         facesContext.addMessage(null, mensaje);
+        this.registro = null;
     }
-
 }
