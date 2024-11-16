@@ -13,114 +13,116 @@
 
     <f:define name="cuerpo">
 
-    <!--
-    Visual de registros
-    -->
+        <h:form id="frmTable">
+            <p:dataTable value="#{frmTipoAsiento.modelo}"
+                         var="r"
+                         rows="10"
+                         lazy="true"
+                         selectionMode="single"
+                         selection="#{frmTipoAsiento.registro}"
+                         paginator="true"
+                         rendered="#{empty frmTipoAsiento.registro}"
+                         widgetVar="dataTableWidget"
+            >
+                <p:ajax event="rowSelect" update="pnlDetalle, frmTable" process="@this"/>
+                <p:column headerText="ID">
+                    <h:outputText value="#{r.idTipoAsiento}"/>
+                </p:column>
+                <p:column headerText="Nombre">
+                    <h:outputText value="#{r.nombre}"/>
+                </p:column>
+                <p:column headerText="Estado">
+                    <h:outputText value="#{r.activo ? 'ACTIVO' : 'INACTIVO'}"/>
+                </p:column>
+                <p:column headerText="Expresion Regular">
+                    <h:outputText value="#{r.expresionRegular}"/>
+                </p:column>
+                <p:column headerText="Comentarios">
+                    <h:outputText value="#{r.comentarios}"/>
+                </p:column>
 
-    <h:form id="frmTable">
-        <p:dataTable value="#{frmTipoAsiento.modelo}"
-                     var="r"
-                     rows="10"
-                     lazy="true"
-                     selectionMode="single"
-                     selection="#{frmTipoAsiento.registro}"
-                     paginator="true"
-        >
-            <p:ajax event="rowSelect" update="pnlDetalle" process="@this"/>
-            <p:column headerText="ID">
-                <h:outputText value="#{r.idTipoAsiento}"/>
-            </p:column>
-            <p:column headerText="Nombre">
-                <h:outputText value="#{r.nombre}"/>
-            </p:column>
-            <p:column headerText="Estado">
-                <h:outputText value="#{r.activo?'ACTIVO':'INACTIVO'}"/>
-            </p:column>
-            <p:column headerText="Expresion Regular">
-                <h:outputText value="#{r.expresionRegular}"/>
-            </p:column>
-            <p:column headerText="Comentarios">
-                <h:outputText value="#{r.comentarios}"/>
-            </p:column>
-
-        </p:dataTable>
+            </p:dataTable>
 
 
-        <h:panelGroup>
-            <p:panelGrid columns="2">
-                <p:commandButton value="Nuevo"
-                                 ajax="true"
-                                 process="@this"
-                                 update="pnlDetalle"
-                                 actionListener="#{frmTipoAsiento.btnNuevoHandler}">
-                </p:commandButton>
+            <h:panelGroup>
+                <p:panelGrid styleClass="background-panelgrid">
+                    <p:commandButton value="Nuevo"
+                                     ajax="true"
+                                     process="@this"
+                                     update="pnlDetalle, frmTable"
+                                     actionListener="#{frmTipoAsiento.btnNuevoHandler}"
+                                     rendered="#{empty frmTipoAsiento.registro}"
+                    >
+                    </p:commandButton>
 
-                <p:commandButton value="Cancelar"
-                                 ajax="true"
-                                 process="@this"
-                                 update="pnlDetalle"
-                                 actionListener="#{frmTipoAsiento.btnCancelarHandler}"
-                                 styleClass="ui-button-danger">
-                </p:commandButton>
 
-            </p:panelGrid>
-        </h:panelGroup>
-    </h:form>
-
-    <!--
-    Seccion de creacion de nuevo registro
-    -->
-
-    <h:panelGroup id="pnlDetalle" styleClass="detalle">
-        <h:form rendered="#{not empty frmTipoAsiento.registro}">
-            <h:panelGrid columns="2">
-                <p:outputLabel value="ID" for="txtId"/>
-                <p:inputText id="txtId" value="#{frmTipoAsiento.registro.idTipoAsiento}"
-                             readonly="true" disabled="true"/>
-
-                <p:outputLabel value="Nombre" for="txtNombre"/>
-                <p:inputText id="txtNombre" value="#{frmTipoAsiento.registro.nombre}" size="70" required="true"/>
-
-                <p:outputLabel value="Publico" for="chkActivo"/>
-                <p:selectBooleanCheckbox id="chkPublico" value="#{frmTipoAsiento.registro.activo}"/>
-
-                <p:outputLabel value="Expresion Regular" for="txtExpresionRegular"/>
-                <p:inputText id="txtExpresionRegular" value="#{frmTipoAsiento.registro.expresionRegular}" size="70" required="true"/>
-
-                <p:outputLabel value="Comentarios" for="txtComentarios"/>
-                <p:inputTextarea id="txtComentarios" value="#{frmTipoAsiento.registro.comentarios}" cols="70" rows="3"/>
-
-            </h:panelGrid>
-
-            <!--
-            Seccion de control de guardado de registro o modificacion/eliminacion de registro existente
-            -->
-
-            <p:panelGrid columns="3">
-                <p:commandButton value="Guardar" ajax="true"
-                                 process="@form"
-                                 update="pnlDetalle :frmTable"
-                                 actionListener="#{frmTipoAsiento.btnGuardarHandler}"
-                                 disabled="#{frmTipoAsiento.registro != null and frmTipoAsiento.registro.idTipoAsiento != null}">
-                </p:commandButton>
-                <p:commandButton value="Eliminar" ajax="true"
-                                 process="@form"
-                                 update="pnlDetalle :frmTable"
-                                 actionListener="#{frmTipoAsiento.btnEliminarHandler}"
-                                 disabled="#{frmTipoAsiento.registro == null or frmTipoAsiento.registro.idTipoAsiento == null}"
-                                 styleClass="ui-button-danger">
-
-                </p:commandButton>
-                <p:commandButton value="Modificar" ajax="true"
-                                 process="@form"
-                                 update="pnlDetalle :frmTable"
-                                 actionListener="#{frmTipoAsiento.btnModificarHandler}"
-                                 disabled="#{frmTipoAsiento.registro == null or frmTipoAsiento.registro.idTipoAsiento == null}"
-                                 styleClass="ui-button-warning">
-                </p:commandButton>
-            </p:panelGrid>
-            <p:messages/>
+                </p:panelGrid>
+            </h:panelGroup>
         </h:form>
-    </h:panelGroup>
+
+
+        <h:panelGroup id="pnlDetalle" styleClass="detalle">
+            <h:form rendered="#{not empty frmTipoAsiento.registro}">
+                <h:panelGrid columns="2">
+                    <p:commandButton value="Cancelar"
+                                     ajax="true"
+                                     process="@this"
+                                     update="pnlDetalle, frmTable"
+                                     actionListener="#{frmTipoAsiento.btnCancelarHandler}"
+                                     styleClass="ui-button-danger"
+                                     rendered="#{not empty frmTipoAsiento.registro}"
+                    >
+                    </p:commandButton>
+                </h:panelGrid>
+
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="ID" for="txtId"/>
+                    <p:inputText id="txtId" value="#{frmTipoAsiento.registro.idTipoAsiento}"
+                                 readonly="true" disabled="true"/>
+
+                    <p:outputLabel value="Nombre" for="txtNombre"/>
+                    <p:inputText id="txtNombre" value="#{frmTipoAsiento.registro.nombre}" size="70" required="true"/>
+
+                    <p:outputLabel value="Publico" for="chkActivo"/>
+                    <p:selectBooleanCheckbox id="chkPublico" value="#{frmTipoAsiento.registro.activo}"/>
+
+                    <p:outputLabel value="Expresion Regular" for="txtExpresionRegular"/>
+                    <p:inputText id="txtExpresionRegular" value="#{frmTipoAsiento.registro.expresionRegular}" size="70" required="true"/>
+
+                    <p:outputLabel value="Comentarios" for="txtComentarios"/>
+                    <p:inputTextarea id="txtComentarios" value="#{frmTipoAsiento.registro.comentarios}" cols="70" rows="3"/>
+                </h:panelGrid>
+
+                <p:panelGrid columns="3">
+                    <p:commandButton value="Guardar" ajax="true"
+                                     process="@form"
+                                     update="pnlDetalle, frmTable"
+                                     actionListener="#{frmTipoAsiento.btnGuardarHandler}"
+                                     oncomplete="PF('dataTableWidget').filter();"
+                                     disabled="#{frmTipoAsiento.registro != null and frmTipoAsiento.registro.idTipoAsiento != null}">
+                    </p:commandButton>
+                    <p:commandButton value="Eliminar" ajax="true"
+                                     process="@form"
+                                     update="pnlDetalle, frmTable"
+                                     actionListener="#{frmTipoAsiento.btnEliminarHandler}"
+                                     disabled="#{frmTipoAsiento.registro == null or frmTipoAsiento.registro.idTipoAsiento == null}"
+                                     styleClass="ui-button-danger"
+                                     oncomplete="PF('dataTableWidget').filter();"
+                    >
+
+                    </p:commandButton>
+                    <p:commandButton value="Modificar" ajax="true"
+                                     process="@form"
+                                     update="pnlDetalle, frmTable"
+                                     actionListener="#{frmTipoAsiento.btnModificarHandler}"
+                                     disabled="#{frmTipoAsiento.registro == null or frmTipoAsiento.registro.idTipoAsiento == null}"
+                                     styleClass="ui-button-warning"
+                                     oncomplete="PF('dataTableWidget').filter();"
+                    >
+                    </p:commandButton>
+                </p:panelGrid>
+                <p:messages/>
+            </h:form>
+        </h:panelGroup>
     </f:define>
 </f:composition>

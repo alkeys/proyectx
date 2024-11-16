@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="jakarta.faces.facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -8,10 +6,7 @@
                 template="WEB-INF/templates/principal.xhtml"
                 xmlns:crud="jakarta.faces.composite/crud"
                 xmlns:f="jakarta.faces.core"
-
 >
-
-
     <ui:define name="titulo">
         #{frmSala.tituloPag}
 
@@ -100,7 +95,6 @@
                     </p:tab>
 
                     <p:tab title="Características" disabled="#{frmSala.estado != 'MODIFICAR'}">
-
 
                         <h:panelGrid>
                             <h:panelGroup id="pnlTablaC">
@@ -251,7 +245,7 @@
                                             <p:panel header="Caracteristica del asiento" style="margin-top:20px;">
                                                 <h:panelGrid columns="2">
                                                     <p:outputLabel for="cbxAsientoTipo" style="color: black"/>
-                                                    caracteristicas para el hasiento
+                                                    caracteristicas para el asiento
                                                 </h:panelGrid>
                                             </p:panel>
                                         </p:panelGrid>
@@ -260,18 +254,45 @@
                             </h:panelGrid>
                         </h:panelGroup>
                     </p:tab>
+
+
+
                     <p:tab id="tabSalaCalendario" title="Programacion">
-                        <p:schedule widgetVar="myschedule"
-                                    locale="es" timeZone="UTC" timeFormat="H(:mm)"
-                        >
-                        </p:schedule>
+
+                        <h:form id="frmSchedule">
+                            <h:outputText value="Programacion para  #{frmSala.registro.nombre} " styleClass="calendar-title"/>
+                            <p:schedule value="#{frmSala.frmFM.eventModel}" widgetVar="myschedule"
+                                        editable="true" locale="es" timeZone="UTC" height="600" hourFormat="24" view="month">
+                                <p:ajax event="dateSelect" listener="#{frmSala.frmFM.onDateSelect}" update="eventDetails"
+                                        oncomplete="PF('eventDialog').show();"/>
+                                <p:ajax event="eventSelect" listener="#{frmSala.frmFM.onEventSelect}" update="eventDetails"
+                                        oncomplete="PF('eventDialog').show();"/>
+                            </p:schedule>
+
+                            <p:dialog id="eventDialog" header="Detalles del Evento" widgetVar="eventDialog" modal="true" showEffect="fade" hideEffect="fade">
+                                <h:panelGrid id="eventDeails" columns="2" cellpadding="5">
+                                    <h:outputLabel for="title" value="Título:" style="color: black" />
+                                    <p:inputText id="title" value="#{frmSala.frmFM.event.title}" required="true"/>
+
+                                    <h:outputLabel for="start" value="Fecha de inicio:" style="color: black"/>
+                                    <p:datePicker id="start" value="#{frmSala.frmFM.event.startDate}" required="true">
+                                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="GMT"/>
+                                    </p:datePicker>
+
+                                    <h:outputLabel for="end" value="Fecha de fin:" style="color: black"/>
+                                    <p:datePicker id="end" value="#{frmSala.frmFM.event.endDate}" required="true">
+                                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="GMT"/>
+                                    </p:datePicker>
+                                </h:panelGrid>
+
+                                <p:commandButton value="Guardar" actionListener="#{frmSala.frmFM.addEvent}"
+                                                 oncomplete="PF('eventDialog').hide();" update="myschedule" />
+                                <p:commandButton value="Eliminar" actionListener="#{frmSala.frmFM.deleteEvent}"
+                                                 oncomplete="PF('eventDialog').hide();" update="myschedule" />
+                            </p:dialog>
+                        </h:form>
                     </p:tab>
-
                 </p:tabView>
-
-
-
-
             </h:panelGroup>
         </h:panelGrid>
     </ui:define>

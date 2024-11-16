@@ -101,19 +101,20 @@ public class frmTipoAsiento implements Serializable {
         taBean.create(registro);
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos guardados exitosamente", null);
         facesContext.addMessage(null, mensaje);
-
+        this.registro = null;
     }
 
     public void btnEliminarHandler(ActionEvent ae) {
         taBean.delete(registro);
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Eliminado exitosamente", null);
         facesContext.addMessage(null, mensaje);
-
+        this.registro = null;
     }
 
     public void btnModificarHandler(ActionEvent ae) {
         taBean.update(registro);
         FacesMessage mensaje = new FacesMessage(FacesMessage.SEVERITY_INFO, "Modificado exitosamente", null);
         facesContext.addMessage(null, mensaje);
+        this.registro = null;
     }
 }

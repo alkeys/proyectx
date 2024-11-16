@@ -23,6 +23,9 @@ import java.util.logging.Logger;
 public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
 
     @Inject
+    FrmMF frmFM;
+
+    @Inject
     FrmAsiento frmAsiento;
 
     @Inject
@@ -76,6 +79,25 @@ public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
         }
     }
 
+    public void cambiarTab(TabChangeEvent tce){
+        if(tce.getTab().getTitle().equals("Características")){
+            if(this.registro != null && this.frmSalaCaracteristica != null){
+                this.frmSalaCaracteristica.setIdSala(this.registro.getIdSala());
+            }
+        }
+        if(tce.getTab().getTitle().equals("Asientos")){
+            if(this.registro != null && this.frmAsiento != null){
+                this.frmAsiento.setIdSala(this.registro.getIdSala());
+
+            }
+        }
+        if(tce.getTab().getTitle().equals("Programacion")){
+            if(this.registro != null && this.frmAsiento != null){
+                this.frmAsiento.setIdSala(this.registro.getIdSala());
+            }
+        }
+    }
+
     @Override
     public FacesContext getFacesContext() {
         return facesContext;
@@ -85,7 +107,6 @@ public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
     public AbstractDataPersistence<Sala> getDataBean(){
         return salBean;
     }
-
 
     @Override
     public Sala createNewEntity(){
@@ -100,22 +121,6 @@ public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
     @Override
     public String getTituloPag(){
         return "Sala";
-    }
-
-
-    public void cambiarTab(TabChangeEvent tce){
-        if(tce.getTab().getTitle().equals("Características")){
-            if(this.registro != null && this.frmSalaCaracteristica != null){
-                this.frmSalaCaracteristica.setIdSala(this.registro.getIdSala());
-            }
-        }
-        if(tce.getTab().getTitle().equals("Asientos")){
-            if(this.registro != null && this.frmAsiento != null){
-                this.frmAsiento.setIdSala(this.registro.getIdSala());
-
-            }
-        }
-
     }
 
     @Override
@@ -136,8 +141,6 @@ public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
         }
         return null;
     }
-
-
 
     public AsientoBean getAsientoBean() {
         return asientoBean;
@@ -183,9 +186,7 @@ public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
         this.sucursalBean = sucursalBean;
     }
 
-    public FrmSalaCaracteristica getFrmSalaCaracteristica() {
-        return frmSalaCaracteristica;
-    }
+    public FrmSalaCaracteristica getFrmSalaCaracteristica() {return frmSalaCaracteristica; }
 
     public void setFrmSalaCaracteristica(FrmSalaCaracteristica frmSalaCaracteristica) {
         this.frmSalaCaracteristica = frmSalaCaracteristica;
@@ -199,5 +200,16 @@ public class FrmSala extends AbstractPfFrm<Sala> implements Serializable {
         this.frmAsiento = frmAsiento;
     }
 
+    public FrmMF getFrmFM() {
+        return frmFM;
+    }
+
+    public void  setFrmFM(FrmMF frmFM) {
+        this.frmFM = frmFM;
+    }
+
+    public void cargarEventosDelMes() {
+        frmFM.cargarEventosDelMes();
+    }
 }
 
