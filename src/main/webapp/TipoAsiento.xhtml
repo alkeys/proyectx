@@ -46,7 +46,7 @@
 
             <h:panelGroup>
                 <p:panelGrid styleClass="background-panelgrid">
-                    <p:commandButton value="Nuevo"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.new']}"
                                      ajax="true"
                                      process="@this"
                                      update="pnlDetalle, frmTable"
@@ -64,7 +64,7 @@
         <h:panelGroup id="pnlDetalle" styleClass="detalle">
             <h:form rendered="#{not empty frmTipoAsiento.registro}">
                 <h:panelGrid columns="2">
-                    <p:commandButton value="Cancelar"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.cancel']}"
                                      ajax="true"
                                      process="@this"
                                      update="pnlDetalle, frmTable"
@@ -94,14 +94,14 @@
                 </h:panelGrid>
 
                 <p:panelGrid columns="3">
-                    <p:commandButton value="Guardar" ajax="true"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.create']}" ajax="true"
                                      process="@form"
                                      update="pnlDetalle, frmTable"
                                      actionListener="#{frmTipoAsiento.btnGuardarHandler}"
                                      oncomplete="PF('dataTableWidget').filter();"
                                      disabled="#{frmTipoAsiento.registro != null and frmTipoAsiento.registro.idTipoAsiento != null}">
                     </p:commandButton>
-                    <p:commandButton value="Eliminar" ajax="true"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']}" ajax="true"
                                      process="@form"
                                      update="pnlDetalle, frmTable"
                                      actionListener="#{frmTipoAsiento.btnEliminarHandler}"
@@ -111,7 +111,7 @@
                     >
 
                     </p:commandButton>
-                    <p:commandButton value="Modificar" ajax="true"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.modify']}" ajax="true"
                                      process="@form"
                                      update="pnlDetalle, frmTable"
                                      actionListener="#{frmTipoAsiento.btnModificarHandler}"

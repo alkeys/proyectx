@@ -38,7 +38,7 @@
 
             <h:panelGroup  >
                 <p:panelGrid styleClass="background-panelgrid">
-                    <p:commandButton value="Nuevo"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.new']}"
                                      ajax="true"
                                      process="@this"
                                      update="pnlDetalle, frmTable"
@@ -53,7 +53,7 @@
         <h:panelGroup id="pnlDetalle" styleClass="detalle">
             <h:form rendered="#{not empty frmTipoPago.registro}">
                 <h:panelGrid columns="2">
-                    <p:commandButton value="Cancelar"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.cancel']}"
                                      ajax="true"
                                      process="@this"
                                      update="pnlDetalle, frmTable"
@@ -74,7 +74,7 @@
                     <p:selectBooleanCheckbox id="chkPublico" value="#{frmTipoPago.registro.activo}"/>
                 </h:panelGrid>
 
-                <p:commandButton value="Guardar" ajax="true"
+                <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.create']}" ajax="true"
                                  process="@form"
                                  update="pnlDetalle ,frmTable"
                                  actionListener="#{frmTipoPago.btnGuardarHandler}"
@@ -82,7 +82,7 @@
                                  disabled="#{frmTipoPago.registro != null and frmTipoPago.registro.idTipoPago != null}">
                 </p:commandButton>
 
-                <p:commandButton value="Eliminar" ajax="true"
+                <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']}" ajax="true"
                                  process="@form"
                                  update="pnlDetalle ,frmTable"
                                  actionListener="#{frmTipoPago.btnEliminarHandler}"
@@ -92,7 +92,7 @@
                 >
                 </p:commandButton>
 
-                <p:commandButton value="Modificar" ajax="true"
+                <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.modify']}" ajax="true"
                                  process="@form"
                                  update="pnlDetalle ,frmTable"
                                  actionListener="#{frmTipoPago.btnModificarHandler}"

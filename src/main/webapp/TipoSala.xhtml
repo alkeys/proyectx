@@ -39,13 +39,13 @@
 
             <h:panelGroup>
                 <p:panelGrid columns="2">
-                    <p:commandButton value="Nuevo Tipo Sala"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.new']} Tipo Sala"
                                      ajax="true"
                                      process="@this"
                                      update="pnlDetalle"
                                      actionListener="#{frmTipoSala.btnNuevoHandler}">
                     </p:commandButton>
-                    <p:commandButton value="Cancelar"
+                    <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.cancel']}"
                                      ajax="true"
                                      process="@this"
                                      update="pnlDetalle"
@@ -72,24 +72,25 @@
                     <p:inputText id="txtExpresion" value="#{frmTipoSala.registro.expresionRegular}" size="70"/>
 
                     <p:outputLabel value="Comentarios" for="txtComentarios"/>
-                    <p:inputTextarea id="txtComentarios" value="#{frmTipoSala.registro.comentarios}" rows="3" cols="70"/>
+                    <p:inputTextarea id="txtComentarios" value="#{frmTipoSala.registro.comentarios}" rows="3"
+                                     cols="70"/>
                 </h:panelGrid>
 
                 <p:panelGrid columns="3">
-                    <p:commandButton value="Guardar" ajax="true"
+                    <p:commandButton  value="#{abstractfrmimplementacion['abstractfrmimplementacion.create']}" ajax="true"
                                      process="@form"
                                      update="pnlDetalle :frmTable"
                                      actionListener="#{frmTipoSala.btnGuardarHandler}"
                                      disabled="#{frmTipoSala.registro != null and frmTipoSala.registro.idTipoSala != null}">
                     </p:commandButton>
-                    <p:commandButton value="Eliminar" ajax="true"
+                    <p:commandButton  value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']}" ajax="true"
                                      process="@form"
                                      update="pnlDetalle :frmTable"
                                      actionListener="#{frmTipoSala.btnEliminarHandler}"
                                      disabled="#{frmTipoSala.registro == null or frmTipoSala.registro.idTipoSala == null}"
                                      styleClass="ui-button-danger">
                     </p:commandButton>
-                    <p:commandButton value="Modificar" ajax="true"
+                    <p:commandButton  value="#{abstractfrmimplementacion['abstractfrmimplementacion.modify']}" ajax="true"
                                      process="@form"
                                      update="pnlDetalle :frmTable"
                                      actionListener="#{frmTipoSala.btnModificarHandler}"

@@ -40,14 +40,14 @@
         </p:dataTable>
         <h:panelGroup>
             <p:panelGrid columns="2">
-                <p:commandButton value="Nuevo"
+                <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.new']}"
                                  ajax="true"
                                  process="@this"
                                  update="pnlDetalle"
                                  actionListener="#{frmTipoReserva.btnNuevoHandler}">
                 </p:commandButton>
 
-                <p:commandButton value="Cancelar"
+                <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.cancel']}"
                                  ajax="true"
                                  process="@this"
                                  update="pnlDetalle"
@@ -78,13 +78,13 @@
 
              </h:panelGrid>
         <p:panelGrid columns="3">
-            <p:commandButton value="Guardar" ajax="true"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.create']}" ajax="true"
                              process="@form"
                              update="pnlDetalle :frmTable"
                              actionListener="#{frmTipoReserva.btnGuardarHandler}"
                              disabled="#{frmTipoReserva.registro != null and frmTipoReserva.registro.idTipoReserva != null}">
             </p:commandButton>
-            <p:commandButton value="Eliminar" ajax="true"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']}" ajax="true"
                              process="@form"
                              update="pnlDetalle :frmTable"
                              actionListener="#{frmTipoReserva.btnEliminarHandler}"
@@ -92,7 +92,7 @@
                              styleClass="ui-button-danger">
 
             </p:commandButton>
-            <p:commandButton value="Modificar" ajax="true"
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.modify']}" ajax="true"
                              process="@form"
                              update="pnlDetalle :frmTable"
                              actionListener="#{frmTipoReserva.btnModificarHandler}"
