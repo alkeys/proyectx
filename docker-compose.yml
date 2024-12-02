@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile # Asegúrate de que esté correcto
+    ports:
+      - "9080:9080"
+      - "9443:9443"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: cine_user
+      DB_PASSWORD: cine_pass
+      DB_NAME: cine_prn335
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: cine_user
+      POSTGRES_PASSWORD: cine_pass
+      POSTGRES_DB: cine_prn335
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Volumen persistente para los datos
+      - ./init-db:/docker-entrypoint-initdb.d/  # Scripts de inicialización
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
