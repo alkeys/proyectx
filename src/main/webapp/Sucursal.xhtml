@@ -1,120 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<f:composition
-        xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:f="jakarta.faces.facelets"
-        xmlns:h="jakarta.faces.html"
-        xmlns:p="http://primefaces.org/ui"
-        template="WEB-INF/templates/principal.xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:p="primefaces"
+                xmlns:crud="jakarta.faces.composite/crud"
+                template="WEB-INF/templates/principal.xhtml"
+>
+    <ui:define name="titulo">
+        #{frmSucursal.tituloDePagina}
+    </ui:define>
 
-    <f:define name="titulo">
-        Sucursal
-    </f:define>
+    <ui:define name="cuerpo">
 
-    <f:define name="cuerpo">
+        <h:panelGrid>
+            <h:panelGroup id="pnlTabla">
+                <h:form id="frmTabla">
+                    <h:panelGrid>
+                        <p:dataTable value="#{frmSucursal.modelo}"
+                                     rows="#{frmSucursal.registrosEnPagina}"
+                                     selection="#{frmSucursal.registro}"
+                                     rendered="#{frmSucursal.estado=='NINGUNO'}"
+                                     var="r"
+                                     lazy="true" paginator="true" selectionMode="single"
 
-        <!-- Tabla para mostrar todas las sucursales guardadas -->
-        <h:form id="frmTable">
-            <p:dataTable value="#{frmSucursal.modelo}"
-                         var="sucursal"
-                         rows="10"
-                         lazy="true"
-                         selectionMode="single"
-                         selection="#{frmSucursal.registro}"
-                         paginator="true">
+                        >
+                            <p:ajax event="rowSelect" update=":pnlDetalle :pnlTabla" process="@this"/>
+                            <p:column headerText="ID">
+                                <h:outputText value="#{r.idSucursal}"/>
+                            </p:column>
+                            <p:column headerText="Nombre">
+                                <h:outputText value="#{r.nombre}"/>
+                            </p:column>
+                            <p:column headerText="Cordenadas">
+                                <h:outputText value="#{r.longitud}"/> , <h:outputText value="#{r.latitud}"/>
+                            </p:column>
+                            <p:column headerText="Estado">
+                                <h:outputText value="#{r.activo?'ACTIVO':'INACTIVO'}"/>
+                            </p:column>
+                            <p:column headerText="Comentarios">
+                                <h:outputText value="#{r.comentarios}"/>
+                            </p:column>
 
-                <p:ajax event="rowSelect" update="pnlDetalle" process="@this"/>
 
-                <p:column headerText="ID">
-                    <h:outputText value="#{sucursal.idSucursal}"/>
-                </p:column>
+                        </p:dataTable>
 
-                <p:column headerText="Nombre">
-                    <h:outputText value="#{sucursal.nombre}"/>
-                </p:column>
-
-                <p:column headerText="Coordenadas">
-                    <h:outputText value="#{sucursal.latitud}, #{sucursal.longitud}"/>
-                </p:column>
-
-                <p:column headerText="Estado">
-                    <h:outputText value="#{sucursal.activo ? 'Activo' : 'Inactivo'}"/>
-                </p:column>
-
-                <p:column headerText="Comentarios">
-                    <h:outputText value="#{sucursal.comentarios}"/>
-                </p:column>
-            </p:dataTable>
-
-            <h:panelGroup>
-                <p:panelGrid columns="2">
-                    <p:commandButton value="Nueva Sucursal"
-                                     ajax="true"
-                                     process="@this"
-                                     update="pnlDetalle"
-                                     actionListener="#{frmSucursal.btnNuevoHandler}">
-                    </p:commandButton>
-
-                    <p:commandButton value="Cancelar"
-                                     ajax="true"
-                                     process="@this"
-                                     update="pnlDetalle"
-                                     actionListener="#{frmSucursal.btnCancelarHandler}"
-                                     styleClass="ui-button-danger">
-                    </p:commandButton>
-                </p:panelGrid>
+                        <h:panelGrid>
+                            <crud:botonesTop2 frm="#{frmSucursal}"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:form>
             </h:panelGroup>
-        </h:form>
 
-        <!-- Formulario para detalles de la sucursal seleccionada o para crear uno nuevo -->
-        <h:panelGroup id="pnlDetalle" styleClass="detalle">
-            <h:form rendered="#{not empty frmSucursal.registro}">
-                <h:panelGrid columns="2">
-                    <p:outputLabel value="ID" for="txtId"/>
-                    <p:inputText id="txtId" value="#{frmSucursal.registro.idSucursal}"
-                                 readonly="true" disabled="true"/>
+            <h:panelGroup id="pnlDetalle">
+                <h:panelGrid>
+                    <h:form id="frmDetalle" rendered="#{frmSucursal.estado!='NINGUNO'}">
+                        <h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <p:outputLabel value="ID" for="txtId"/>
+                                <p:inputText id="txtId" disabled="true" readonly="true"
+                                             value="#{frmSucursal.registro.idSucursal}"/>
+                                <p:outputLabel value="Nombre" for="txtNombre"/>
+                                <p:inputText id="txtNombre" value="#{frmSucursal.registro.nombre}" size="70"/>
+                                <p:outputLabel value="Activo" for="chkActivo"/>
+                                <h:selectBooleanCheckbox id="chkActivo" value="#{frmSucursal.registro.activo}"/>
 
-                    <p:outputLabel value="Nombre" for="txtNombre"/>
-                    <p:inputText id="txtNombre" value="#{frmSucursal.registro.nombre}" size="70" required="true"/>
+                                <p:outputLabel value="Longitud" for="txtLongitud"/>
+                                <p:inputText id="txtLongitud" value="#{frmSucursal.registro.longitud}" size="70"/>
 
-                    <p:outputLabel value="Latitud" for="txtLatitud"/>
-                    <p:inputText id="txtLatitud" value="#{frmSucursal.registro.latitud}" size="70" required="true"/>
+                                <p:outputLabel value="Latitud" for="txtLatitud"/>
+                                <p:inputText id="txtLatitud" value="#{frmSucursal.registro.latitud}" size="70"/>
 
-                    <p:outputLabel value="Longitud" for="txtLongitud"/>
-                    <p:inputText id="txtLongitud" value="#{frmSucursal.registro.longitud}" size="70" required="true"/>
+                                <p:outputLabel value="Comentarios" for="txtComentarios"/>
+                                <h:inputTextarea id="txtComentarios" value="#{frmSucursal.registro.comentarios}" cols="70" rows="3"/>
 
-                    <p:outputLabel value="Activo" for="chkActivo"/>
-                    <p:selectBooleanCheckbox id="chkActivo" value="#{frmSucursal.registro.activo}"/>
-
-                    <p:outputLabel value="Comentarios" for="txtComentarios"/>
-                    <p:inputTextarea id="txtComentarios" value="#{frmSucursal.registro.comentarios}" rows="4" cols="50"/>
+                            </h:panelGrid>
+                            <crud:botonesBottom2 frm="#{frmSucursal}"/>
+                        </h:panelGrid>
+                    </h:form>
                 </h:panelGrid>
-
-                <!-- Botones para guardar, eliminar y modificar la sucursal -->
-                <p:panelGrid columns="3">
-                    <p:commandButton value="Guardar" ajax="true"
-                                     process="@form"
-                                     update="pnlDetalle :frmTable"
-                                     actionListener="#{frmSucursal.btnGuardarHandler}"
-                                     disabled="#{frmSucursal.registro != null and frmSucursal.registro.idSucursal != null}">
-                    </p:commandButton>
-                    <p:commandButton value="Eliminar" ajax="true"
-                                     process="@form"
-                                     update="pnlDetalle :frmTable"
-                                     actionListener="#{frmSucursal.btnEliminarHandler}"
-                                     disabled="#{frmSucursal.registro == null or frmSucursal.registro.idSucursal == null}"
-                                     styleClass="ui-button-danger">
-                    </p:commandButton>
-                    <p:commandButton value="Modificar" ajax="true"
-                                     process="@form"
-                                     update="pnlDetalle :frmTable"
-                                     actionListener="#{frmSucursal.btnModificarHandler}"
-                                     disabled="#{frmSucursal.registro == null or frmSucursal.registro.idSucursal == null}"
-                                     styleClass="ui-button-warning">
-                    </p:commandButton>
-                </p:panelGrid>
-                <p:messages/>
-            </h:form>
-        </h:panelGroup>
-    </f:define>
-</f:composition>
+            </h:panelGroup>
+        </h:panelGrid>
+    </ui:define>
+</ui:composition>
