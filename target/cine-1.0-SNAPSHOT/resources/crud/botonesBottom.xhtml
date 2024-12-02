@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:component
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:cc="jakarta.faces.composite"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="primefaces">
+
+    <cc:interface>
+        <cc:attribute
+                name="frm"
+                type="sv.edu.occ.ues.ingenieria.prn335.cine.boundary.jsf.AbstractFrm"
+                required="true"
+                shortDescription="Maneja las funcionalidades de CRUD."
+        />
+        <cc:attribute
+                name="refrescar"
+                type="java.lang.String"
+                required="false"
+                default=":pnlDetalle :frmTable"
+                shortDescription="Componentes a actualizar después de realizar una acción en el formulario."
+        />
+    </cc:interface>
+
+    <cc:implementation>
+        <h:panelGrid columns="3">
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.key']}"
+                             update="#{cc.attrs.refrescar}"
+                             actionListener="#{cc.attrs.frm.btnGuardarHandler}">
+            </p:commandButton>
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.delete']}"
+                             update="#{cc.attrs.refrescar}"
+                             actionListener="#{cc.attrs.frm.btnEliminarHandler}"
+                             styleClass="ui-button-danger">
+            </p:commandButton>
+            <p:commandButton value="#{abstractfrmimplementacion['abstractfrmimplementacion.update']}"
+                             update="#{cc.attrs.refrescar}"
+                             actionListener="#{cc.attrs.frm.btnModificarHandler}">
+            </p:commandButton>
+
+        </h:panelGrid>
+    </cc:implementation>
+</ui:component>

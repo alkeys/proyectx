@@ -1,0 +1,83 @@
+body
+{
+    background-color: darkslategray;
+    color: aliceblue;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0 auto;
+}
+.custom-icon-sala {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-repeat: no-repeat;
+}
+
+h1
+{
+    font-family: 'Fira Code Retina', sans-serif;
+    text-align: center;
+    color: #dff0d8;
+    text-shadow:
+            -1px -1px 0px black,
+            1px -1px 0px black,
+            -1px  1px 0px black,
+            1px  1px 0px black;
+}
+.calendar-title {
+    font-weight: bold;
+    font-size: 18px;
+    color: #555555FF;
+}
+/* Estilo para el panel de tipo de reserva */
+.tipoReservaPanel {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Espacio entre el texto y el campo */
+}
+
+/* Estilo para el texto junto al campo de tipo de reserva */
+.textoTipoReserva {
+    font-size: 14px;
+    color: #555;
+    text-align: left; /* Alineación a la izquierda */
+}
+
+/* Estilo para el recuadro blanco de la fecha */
+.panelFecha {
+    background-color: white; /* Fondo blanco */
+    border: 1px solid #dcdcdc; /* Borde suave */
+    padding: 15px; /* Espaciado interno */
+    margin-bottom: 20px; /* Separación con otros elementos */
+}
+
+/* Estilo para los botones de navegación */
+.buttonPanel {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 20px;
+}
+
+/* Estilo para el botón 'Next' a la izquierda del recuadro */
+.buttonPanelLeft {
+    margin-bottom: 70px; /* Espacio debajo del botón */
+}
+
+/* Estilo personalizado para las pestañas */
+.custom-tabs .ui-tabview-nav {
+    background-color: #f0f0f0;
+}
+.custom-tabs .ui-tabview-nav li.ui-state-active {
+    background-color: #cce5ff;
+}
+
+/* Contenedor que usa flexbox para alinear el contenido */
+.botonNextContainer {
+    display: flex;
+    justify-content: flex-start; /* Alinea a la izquierda */
+    position: absolute;
+    bottom: 20px;  /* Distancia desde la parte inferior */
+    left: 20px;    /* Distancia desde la parte izquierda */
+}
