@@ -7,11 +7,17 @@ import java.util.List;
 
 @Entity
 @Table(name = "sucursal", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "Sucursal.findAll", query = "SELECT sucu FROM Sucursal sucu ORDER BY sucu.idSucursal ASC")
+})
 public class Sucursal {
     @Id
     @Column(name = "id_sucursal", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idSucursal;
+
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "idSucursal")
+    private List<Sala> SalaList;
 
     @Size(max = 155)
     @Column(name = "nombre", length = 155)
@@ -30,23 +36,19 @@ public class Sucursal {
     @Column(name = "activo")
     private Boolean activo;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "idSucursal")
-    public List<Sala> SalaList;
-
-    public Sucursal()
-    {
-
-    }
     public Sucursal(Integer idSucursal) {
         this.idSucursal = idSucursal;
+    }
+
+    public Sucursal() {
     }
 
     public Integer getIdSucursal() {
         return idSucursal;
     }
 
-    public void setIdSucursal(Integer id) {
-        this.idSucursal = id;
+    public void setIdSucursal(Integer idSucursal) {
+        this.idSucursal = idSucursal;
     }
 
     public String getNombre() {
@@ -89,11 +91,4 @@ public class Sucursal {
         this.activo = activo;
     }
 
-    public List<Sala> getSalaList() {
-        return SalaList;
-    }
-
-    public void setSalaList(List<Sala> salaList) {
-        SalaList = salaList;
-    }
 }

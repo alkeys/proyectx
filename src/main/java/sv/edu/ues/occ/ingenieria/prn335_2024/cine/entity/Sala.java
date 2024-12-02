@@ -10,7 +10,9 @@ import java.util.List;
 @NamedQueries({
         //Se registra en el motor una sola vez, hay que colocar un nombre único porque no se puede repetir
         @NamedQuery(name= "Sala.findByIdTipoSala",
-                query = "SELECT s FROM SalaCaracteristica sc JOIN sc.idSala s WHERE sc.idTipoSala.idTipoSala = :idTipoSala GROUP BY s.idSala ORDER BY s.nombre ASC")
+                query = "SELECT s FROM SalaCaracteristica sc JOIN sc.idSala s WHERE sc.idTipoSala.idTipoSala = :idTipoSala GROUP BY s.idSala ORDER BY s.nombre ASC"),
+        @NamedQuery(name = "Sala.findAll", query = "SELECT sl FROM Sala sl ORDER BY sl.idSala ASC")
+
 })
 public class Sala {
     @Id

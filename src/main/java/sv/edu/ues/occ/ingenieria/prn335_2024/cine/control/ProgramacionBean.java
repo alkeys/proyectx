@@ -4,6 +4,7 @@ import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Pelicula;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.Programacion;
 import sv.edu.ues.occ.ingenieria.prn335_2024.cine.entity.TipoReserva;
@@ -12,7 +13,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @LocalBean
 @Stateless
@@ -107,5 +112,43 @@ public class ProgramacionBean extends AbstractDataPersistence<Programacion> impl
                 .setParameter("fechaInicio", fechaInicio)
                 .setParameter("fechaFin", fechaFin)
                 .getResultList();
+    }
+
+
+
+
+    public List<Programacion> findAll(int first, int max) {
+        try{
+            TypedQuery<Programacion> q = em.createNamedQuery("Programacion.findAll", Programacion.class);
+            q.setFirstResult(first);
+            q.setMaxResults(max);
+            return q.getResultList();
+        }catch (Exception e){
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage());
+        }
+        return List.of();
+    }
+
+    public List<Programacion> findByDate(final OffsetDateTime desde, final OffsetDateTime hasta) {
+        try {
+            TypedQuery<Programacion> q = em.createNamedQuery("Programacion.findByDate", Programacion.class);
+            q.setParameter("desde", desde);
+            q.setParameter("hasta", hasta);
+            return q.getResultList();
+        }catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
+        }
+        return List.of();
+    }
+
+    public Map<Long, Programacion> getProgramacionesAsMap() {
+        List<Programacion> programaciones = findAll(0,1000);
+        Map<Long, Programacion> programacionesMap = new HashMap<>();
+
+        for (Programacion programacion : programaciones) {
+            programacionesMap.put(programacion.getIdProgramacion(), programacion);
+        }
+
+        return programacionesMap;
     }
 }

@@ -8,25 +8,32 @@ import java.util.List;
 @Entity
 @Table(name = "asiento", schema = "public")
 @NamedQueries({
-        @NamedQuery(name = "Asiento.findByIdSala",query = "SELECT asi FROM Asiento asi WHERE asi.idSala.idSala=:idSala ORDER BY asi.idAsiento ASC "),
-        @NamedQuery(name = "Asiento.countByIdSala", query = "SELECT COUNT(asi.idAsiento) FROM Asiento asi WHERE asi.idSala.idSala=:idSala")
+        @NamedQuery(name = "Asiento.findByIdSala", query = "SELECT asiento FROM Asiento asiento WHERE asiento.idSala.idSala=:idSala ORDER BY asiento.idAsiento ASC"),
+        @NamedQuery(name = "Asiento.findDisponiblesByIdProgramacion", query = "SELECT a FROM Asiento a WHERE a.idSala.idSala IN (SELECT s.idSala FROM Programacion pr JOIN pr.idSala s WHERE pr.idProgramacion =:idProgramacion) AND a.idAsiento NOT IN (SELECT rd.idAsiento.idAsiento FROM ReservaDetalle rd WHERE rd.idReserva.idProgramacion.idProgramacion= :idProgramacion) ORDER BY a.idAsiento ASC" )
 })
+
 public class Asiento {
     @Id
     @Column(name = "id_asiento", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAsiento;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sala")
     private Sala idSala;
 
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "idAsiento")
+    private List<AsientoCaracteristica> AsientoCaracteristicaList;
 
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "idAsiento")
-    private List<ReservaDetalle> reservaDetalles;
+    private List<ReservaDetalle> ReservaDetalleList;
 
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "idAsiento")
-    private List<AsientoCaracteristica> asientoCaracteristicaList;
+    public Asiento(Long idAsiento) {
+        this.idAsiento=idAsiento;
+    }
+
+    public Asiento() {
+    }
 
     @Size(max = 155)
     @Column(name = "nombre", length = 155)
@@ -39,8 +46,8 @@ public class Asiento {
         return idAsiento;
     }
 
-    public void setIdAsiento(Long id) {
-        this.idAsiento = id;
+    public void setIdAsiento(Long idAsiento) {
+        this.idAsiento = idAsiento;
     }
 
     public Sala getIdSala() {
@@ -67,19 +74,4 @@ public class Asiento {
         this.activo = activo;
     }
 
-    public List<ReservaDetalle> getReservaDetalles() {
-        return reservaDetalles;
-    }
-
-    public void setReservaDetalles(List<ReservaDetalle> reservaDetalles) {
-        this.reservaDetalles = reservaDetalles;
-    }
-
-    public List<AsientoCaracteristica> getAsientoCaracteristicaList() {
-        return asientoCaracteristicaList;
-    }
-
-    public void setAsientoCaracteristicaList(List<AsientoCaracteristica> asientoCaracteristicaList) {
-        this.asientoCaracteristicaList = asientoCaracteristicaList;
-    }
 }

@@ -8,6 +8,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "programacion", schema = "public")
+@NamedQueries({
+        @NamedQuery(name = "Programacion.findAll", query = "SELECT pr FROM Programacion pr ORDER BY pr.idProgramacion ASC"),
+        @NamedQuery(name = "Programacion.findByDate", query ="SELECT pr FROM Programacion pr WHERE pr.desde >=:desde AND pr.hasta <:hasta")
+})
 public class Programacion {
     @Id
     @Column(name = "id_programacion", nullable = false)
